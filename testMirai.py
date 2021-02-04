@@ -12,7 +12,7 @@ else:
     raise SystemExit('ERROR: Connect failed, programme exit')
 
 #鉴权
-requestData = {'authKey': 'INITKEYW56fGXcy'}
+requestData = {'authKey': 'NSROBOTdevmode'}
 res = requests.post('http://0.0.0.0:8080/auth',json=requestData)
 jsonData = res.json()
 if jsonData['code'] == 0:
