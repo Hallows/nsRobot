@@ -1,0 +1,15 @@
+刀魂,绝返,分野,北漠,锋鸣,安疆,活脉,吓魂,从容,愤恨,蔑视,骇日
+
+盾宏：
+/cast [nobuff:血怒|bufftime:骇日>53.9] 血怒
+/cast [rage>45] 盾飞
+/cast 盾击
+/cast 盾压
+/cast 盾猛
+/cast 盾刀
+
+刀宏：
+/fcast 斩刀
+/cast [last_skill=斩刀|skill_notin_cd:绝刀] 绝刀
+/cast [rage>9] 劫刀
+/cast [rage<9] 盾回

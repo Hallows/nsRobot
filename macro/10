@@ -1,0 +1,9 @@
+扬戈,神勇,骁勇,击水,劲风,牧云,风虎,战心,破楼兰,夜征,龙血,虎贲
+
+/cast 撼如雷
+/cast [nobuff:驰骋&nobuff:弹跳] 任驰骋
+/cast 突
+/cast [rage<3|bufftime:破楼兰<1.5] 灭
+/cast [rage>4] 龙牙
+/cast [rage<4] 龙吟
+/cast 穿云
