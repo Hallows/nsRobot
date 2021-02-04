@@ -46,6 +46,7 @@ def verify(miraiURL,session,botNumber):
     else:
         raise SystemExit('ERROR: Verify Failed!')
 
+
 #释放sesson并清除bot的信息缓存(程序结束前调用否则可能导致溢出)
 #输入-miraiURL: mirai的HTTPAPI地址
 #输入-session: 有效的session，通过getAuth()获取
@@ -62,3 +63,15 @@ def release(miraiURL,session,botNumber):
         print('Release Success!')
     else:
         raise SystemExit('ERROR: Release Failed!')
+
+#设置指定的session所对应的对话开启webSocket代理服务（默认全局关闭）
+#输入-miraiURL: mirai的HTTPAPI地址
+#输入-session: 待开启WS服务的有效session，通过getAuth()获取
+def startWebSocket(miraiURL, session):
+    requestData = {
+        'sessionKey': session,
+        "enableWebsocket": True
+        }
+    url=miraiURL+'/config'
+    requests.post(url=url, json=requestData)
+    print('WebSocketStarted!')
