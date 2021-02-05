@@ -1,4 +1,4 @@
-dbHost = 'localhost'
+dbHost = '139.198.178.48'
 dbPort = 3306
 dbUser = 'nsBot'
 dbPassword = 'nanshanrobot'
