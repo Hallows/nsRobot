@@ -1,3 +1,10 @@
 import generate_image
+import pymysql
+import init
 
-generate_image.GetImg(1001)
+db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
+                     password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+
+generate_image.GetImg(db, 1001)
+
+db.close()
