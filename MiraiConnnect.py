@@ -75,3 +75,33 @@ def startWebSocket(miraiURL, session):
     url=miraiURL+'/config'
     requests.post(url=url, json=requestData)
     print('WebSocketStarted!')
+
+#对指定群聊发送信息
+#输入-miraiURL: mirai的HTTPAPI地址
+#输入-session: 待开启WS服务的有效session，通过getAuth()获取
+#输入-target：目标群聊的群号
+#输入-content：若需要发送文字则为文字内容，若需要发送图片为图片URL
+#输入-messageTye：默认为TEXT即文字，也可接受Image即图片
+#输入-needAT：是否需要在发送内容前at指定人，默认为0即不at
+#输入-ATQQ：如果需要at，传入uint型的QQ号，注意！不是字符串！
+def sendGroupMessage(miraiURL, session, target,  content:str,messageType="TEXT", needAT=0, ATQQ=0):
+    chain=[]
+    if (needAT == 1):
+        temp={"type": "At", "target": ATQQ, "display": "@来源"}
+        chain.append(temp)
+    if (messageType == "TEXT"):
+        temp = {"type": "Plain", "text": content}
+        chain.append(temp)
+    elif (messageType == "image"):
+        temp = {"type": "Image", "url": content}
+        chain.append(temp)
+    requestData = {
+    "sessionKey": session,
+    "target": target,
+    "messageChain": chain
+    }
+    print(requestData)
+    url=miraiURL+'/sendGroupMessage'
+    res = requests.post(url=url, json=requestData)
+    jsonData = res.json()
+    print(jsonData['code'])
