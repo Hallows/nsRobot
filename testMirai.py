@@ -4,10 +4,15 @@ import json
 import time
 import requests
 import websocket
+import pymysql
 try:
     import thread
 except ImportError:
     import _thread as thread
+try:
+    import init
+except ImportError:
+    print("can not find init file")
 
 
 miraiURL = 'http://0.0.0.0:8080'
@@ -15,7 +20,7 @@ miraiKey = 'NSROBOTdevmode'
 miraiQQ = 2274927840
 session='newsession'
 
-def sysinit():
+def initMirai():
     #获取版本
     mirai.getVersion(miraiURL=miraiURL)
     #获取session
@@ -37,7 +42,8 @@ def on_message(ws, message):
         incomeMessage = incomeJson['messageChain'][1]['text']
         temp='Get income message from GroupChat {} named {}(QQ:{}) with text: {}'.format(incomeGroupChatID,incomeMemberName,incomeQQ,incomeMessage)
         print(temp)
-        action.judge(message=incomeMessage,QQ=incomeQQ,name=incomeMemberName,group=incomeGroupChatID)
+        action.judge(message=incomeMessage, QQ=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
+        mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
 
 def on_error(ws, error):
     print(error)
@@ -52,8 +58,9 @@ def on_open(ws):
     thread.start_new_thread(run, ())
 
 if __name__ == "__main__":
-    sysinit()
-    wsURL='ws://0.0.0.0:8080/message?sessionKey='+session
+    initMirai()
+    wsURL = 'ws://0.0.0.0:8080/message?sessionKey=' + session
+    #global db= pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp(url=wsURL,
                             on_message = on_message,
@@ -61,4 +68,3 @@ if __name__ == "__main__":
                             on_close = on_close)
     ws.on_open = on_open
     ws.run_forever()
-
