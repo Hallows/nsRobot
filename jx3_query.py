@@ -59,7 +59,3 @@ def getExam(subject: str):
     if r_data['code'] == 0:
         return ''
     return r_data['data']
-
-
-if __name__ == '__main__':
-    print(getExam("古琴"))
