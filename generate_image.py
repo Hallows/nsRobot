@@ -216,5 +216,8 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
     return name
 
 
-def GetImg(db, id: int) -> str:
+def GetImg(id: int) -> str:
+    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
+                         password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     return GenerateImage(db, GetMember(db, id))
+    db.close()
