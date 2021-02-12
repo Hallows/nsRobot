@@ -1,0 +1,18 @@
+奇穴：
+星旗,雪覆,折意,风骨,北阙,渊岳,玄肃,王师,百节,忘断,徵逐,青山共我
+
+宏：
+1.远宏：
+/cast [buff:百节>1] 崔嵬鬼步
+/cast 青山共我
+/cast [nobuff:忘断] 血覆黄泉
+/cast 幽冥窥月
+/cast [nobuff:忘断] 日月吴钩
+/cast [buff:百节>2] 乱天狼
+/cast 寂洪荒
+2.近宏：
+/cast [buff:百节>2] 隐风雷
+/cast [buff:徵逐&buff:单链] 青山共我
+/fcast [nobuff:单链] 血覆黄泉
+/fcast [buff:单链] 金戈回澜
+/cast [buff:单链] 星垂平野

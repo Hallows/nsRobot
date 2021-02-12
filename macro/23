@@ -1,0 +1,22 @@
+奇穴：
+孤漠,归酣,阳关,霜天,含风,临江,分疆,星火,楚歌,绝期,重烟,心镜
+
+大刀宏：
+/cast 雷走风切
+/cast 上将军印
+/cast [bufftime:尘身<0.7] 停止释放
+/cast [bufftime:命中标记>3|last_skill~=上将军印&nobuff:命中标记] 雪絮金屏
+/cast [sun<20] 龙骧虎步
+
+双刀宏：
+/cast [tnobuff:闹须弥] 闹须弥
+/cast [tbuff:闹须弥] 雪絮金屏
+
+鞘刀宏：
+/cast [bufftime:含风<2.88] 刀啸风吟
+/cast 坚壁清野
+/cast [skill_notin_cd:上将军印] 秀明尘身
+/cast [bufftime:命中标记<1.82&buff:上将军印=5] 秀明尘身
+/cast 刀啸风吟
+
+双刀起手挂流血

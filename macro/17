@@ -1,0 +1,29 @@
+承伤流奇穴：
+盾威,激昂,铿锵,坚铁,千山,当关,活血,雄峦,愤恨,高城,叱威,崇云
+寒甲流奇穴：
+盾威,炼狱,铿锵,坚铁,千山,割裂，蔑视,恋战,从容,寒甲,叱威,崇云
+
+承伤流宏：
+盾宏：
+/fcast [rage<80] 血怒
+/cast [rage>79&nobuff:盾挡] 盾挡
+/cast 盾压
+/cast 盾猛
+/cast 盾刀
+刀宏：
+/fcast [rage<80] 血怒
+/cast 盾回
+
+
+寒甲流宏：
+盾宏：
+/cast 盾压
+/cast [nobuff:崇云] 血怒
+/cast [rage>105] 盾挡
+/cast [rage>29&bufftime:寒甲>4.9&bufftime:盾挡<10&tbufftime:流血<8] 盾飞
+/cast 盾刀
+刀宏：
+/cast 斩刀
+/cast [tbufftime:流血>17] 闪刀
+/cast 劫刀
+/cast [bufftime:盾飞<22.1&tbuff:流血] 盾回
