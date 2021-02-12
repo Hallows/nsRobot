@@ -8,3 +8,4 @@ dbCharset = 'utf8'
 MENTAL_ICON_PATH = "./mental_icon/"
 IMAGE_PATH = "./temp/img/"
 FONT_PATH = "./font/"
+MACRO_PATH = "./macro/"
