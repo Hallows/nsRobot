@@ -42,8 +42,8 @@ def on_message(ws, message):
         incomeMessage = incomeJson['messageChain'][1]['text']
         temp='Get income message from GroupChat {} named {}(QQ:{}) with text: {}'.format(incomeGroupChatID,incomeMemberName,incomeQQ,incomeMessage)
         print(temp)
-        action.judge(message=incomeMessage, QQ=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
-        mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
+        action.judge(miraiURL,session,message=incomeMessage, QQ=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
+        #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
 
 def on_error(ws, error):
     print(error)

@@ -10,22 +10,25 @@ import MiraiConnnect as mirai
 keyNewTeam = ['开团','新建团队']
 miraiURL = 'http://0.0.0.0:8080'
 
-def judge(message, QQ, name, group):
+def judge(miraiURL,session,message, QQ, name, group):
     if message[:2] == 'ns': #如果开头不是ns那么一切免谈，无事发生
         command = message[2:] #把ns去掉后面开始分割这个指令
         commandPart = command.split( ) #按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
         if commandPart[0] in keyNewTeam:
-            date = commandPart[1]
-            time = commandPart[2]
-            dungeon = commandPart[3]
-            comment = commandPart[4]
-            QQ=QQ
-            if commandPart[5] == '1': #这TM判断不了直接报索引溢出就尼玛离谱，垃圾python毁我青春
-                useBlackList = 1
-            else:
+            try:
+                date = commandPart[1]
+                time = commandPart[2]
+                dungeon = commandPart[3]
+                comment = commandPart[4]
+            except:
+                mirai.throwError(miraiURL=miraiURL,session=session,target=group,errCode=100)
+            try:
+                useBlackList = commandPart[5]
+            except:
                 useBlackList = 0
             temp='收到开团指令 日期：{} 时间：{} 副本名称：{} 注释：{} 是否启用黑名单：{}'.format(date,time,dungeon,comment,useBlackList)
             print(temp)
+        #elif commandPart[0] in 
 
 def actionNewTeam(db, date, time, dungeon, comment, useBlackList,QQ):
     cursor = db.cursor()

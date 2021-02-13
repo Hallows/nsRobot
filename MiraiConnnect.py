@@ -100,8 +100,28 @@ def sendGroupMessage(miraiURL, session, target,  content:str,messageType="TEXT",
     "target": target,
     "messageChain": chain
     }
-    print(requestData)
     url=miraiURL+'/sendGroupMessage'
     res = requests.post(url=url, json=requestData)
     jsonData = res.json()
-    print(jsonData['code'])
+    if jsonData['code'] != 0:
+        print("get error when send message")
+
+#------IMPORTANT-------
+#此函数用于抛出错误提示，鉴于错误意料外的错误列表可能会很长，此函数恒放置于此文件最后！
+#错误码-含义
+#100-参数错误
+def throwError(miraiURL, session, target,errCode):
+    chain = []
+    if errCode == 100:
+        temp = {"type": "Plain", "text": "指令参数错误，请使用 ns帮助 查看所有指令列表"}
+        chain.append(temp)
+    requestData = {
+    "sessionKey": session,
+    "target": target,
+    "messageChain": chain
+    }
+    url=miraiURL+'/sendGroupMessage'
+    res = requests.post(url=url, json=requestData)
+    jsonData = res.json()
+    if jsonData['code'] != 0:
+        print("get error when send message")
