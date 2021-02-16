@@ -41,7 +41,7 @@ def judge(miraiURL, session, db, message, QQ, name, group):
         if res == 0:
             temp='收到开团指令 日期：{} 时间：{} 副本名称：{} 注释：{} 是否启用黑名单：{}'.format(date, time, dungeon, comment, useBlackList)
             print(temp)
-            mirai.sendGroupMessage(miraiURL, session, target=incomeGroupChatID, content=temp, messageType="TEXT")
+            mirai.sendGroupMessage(miraiURL, session, target=group, content=temp, messageType="TEXT")
         elif res == 1:
             print("权限错误")
             mirai.throwError(miraiURL=miraiURL, session=session, target=group, errCode=400)
@@ -50,15 +50,15 @@ def judge(miraiURL, session, db, message, QQ, name, group):
         try:
             teamNumber = commandPart[1].strip()
         except:
-            # List All
+            # List All TODO
             return
 
-        #teams = getTeams(db)
-        #if teamNumber > len(teams):
+        #teams = getTeams(db) TODO
+        #if teamNumber > len(teams) or teamNumber <= 0:
         #    print('Team does not exist')
         #    return
         #
-        #printTeam(teams[teamNumber])
+        #printTeam(teams[teamNumber]) TODO
 
     elif entrance in keyEnroll:
         try:
@@ -75,12 +75,16 @@ def judge(miraiURL, session, db, message, QQ, name, group):
             # print('Please enter memberID')
             return
 
-        #teams = getTeams(db)
-        #if teamNumber > len(teams):
+        #teams = getTeams(db) TODO
+        #if teamNumber > len(teams) or teamNumber <= 0:
         #    print('Team does not exist')
         #    return
         #
-        #enrollTeam(db, teams[teamNumber], memberID)
+        #if isFull(teams[teamNumber]): TODO
+        #    print('Team is full')
+        #    return
+        #
+        #enrollTeam(db, teamNumber, memberID) TODO
 
     elif entrance in keyDisenroll:
         return
