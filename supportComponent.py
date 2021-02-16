@@ -8,5 +8,5 @@ def changeTime(date, time):
         outdate = yesterday = (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y%m%d')
     if date == '后天':
         outdate = yesterday = (datetime.date.today() + datetime.timedelta(days=2)).strftime('%Y%m%d')
-    try:
+    #try:
         

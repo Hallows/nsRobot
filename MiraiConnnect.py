@@ -84,15 +84,15 @@ def startWebSocket(miraiURL, session):
 #输入-messageTye：默认为TEXT即文字，也可接受Image即图片
 #输入-needAT：是否需要在发送内容前at指定人，默认为0即不at
 #输入-ATQQ：如果需要at，传入uint型的QQ号，注意！不是字符串！
-def sendGroupMessage(miraiURL, session, target,  content:str,messageType="TEXT", needAT=0, ATQQ=0):
+def sendGroupMessage(miraiURL, session, target, content:str, messageType="TEXT", needAT=False, ATQQ=None):
     chain=[]
-    if (needAT == 1):
+    if needAT:
         temp={"type": "At", "target": ATQQ, "display": "@来源"}
         chain.append(temp)
-    if (messageType == "TEXT"):
+    if messageType == "TEXT":
         temp = {"type": "Plain", "text": content}
         chain.append(temp)
-    elif (messageType == "image"):
+    elif messageType == "image":
         temp = {"type": "Image", "url": content}
         chain.append(temp)
     requestData = {

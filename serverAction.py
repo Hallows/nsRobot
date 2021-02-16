@@ -9,34 +9,82 @@ import MiraiConnnect as mirai
 import supportComponent as support
 
 keyNewTeam = ['开团','新建团队']
+keyQuery = ['查看团队']
+keyEnroll = ['报名']
+keyDisenroll = ['取消报名']
 miraiURL = 'http://0.0.0.0:8080'
 
-def judge(miraiURL,session,db,message, QQ, name, group):
-    if message[:2] == 'ns': #如果开头不是ns那么一切免谈，无事发生
-        command = message[2:] #把ns去掉后面开始分割这个指令
-        commandPart = command.split( ) #按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
-        if commandPart[0] in keyNewTeam:
-            try:#尝试解析参数，如果出错说明输入参数有误
-                date = commandPart[1]
-                time = commandPart[2]
-                dungeon = commandPart[3]
-                comment = commandPart[4]
-            except:
-                mirai.throwError(miraiURL=miraiURL, session=session, target=group, errCode=100)
+def judge(miraiURL, session, db, message, QQ, name, group):
+    if message[:2] is not 'ns': #如果开头不是ns那么一切免谈，无事发生
+        return
+
+    ############## Main ###################
+    command = message[2:].strip() #把ns去掉后面开始分割这个指令
+    commandPart = command.split( ) #按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
+    entrance = commandPart[0].strip()
+
+    if entrance in keyNewTeam:
+        try:#尝试解析参数，如果出错说明输入参数有误
+            date = commandPart[1].strip()
+            time = commandPart[2].strip()
+            dungeon = commandPart[3].strip()
+            comment = commandPart[4].strip()
+        except:
+            mirai.throwError(miraiURL=miraiURL, session=session, target=group, errCode=100)
             
-            try:#尝试解析是否指定了黑名单
-                useBlackList = commandPart[5]
-            except:
-                useBlackList = 0
+        try:#尝试解析是否指定了黑名单
+            useBlackList = commandPart[5].strip()
+        except:
+            useBlackList = 0
             
-            res = createNewTeam(db, data, time, dungeon, comment, useBlackList, QQ)
-            if res == 0:
-                temp='收到开团指令 日期：{} 时间：{} 副本名称：{} 注释：{} 是否启用黑名单：{}'.format(date,time,dungeon,comment,useBlackList)
-                print(temp)
-            elif res == 1:
-                print("权限错误")
-                mirai.throwError(miraiURL=miraiURL, session=session, target=group, errCode=400)
-        #elif commandPart[0] in 
+        res = createNewTeam(db, data, time, dungeon, comment, useBlackList, QQ)
+        if res == 0:
+            temp='收到开团指令 日期：{} 时间：{} 副本名称：{} 注释：{} 是否启用黑名单：{}'.format(date, time, dungeon, comment, useBlackList)
+            print(temp)
+            mirai.sendGroupMessage(miraiURL, session, target=incomeGroupChatID, content=temp, messageType="TEXT")
+        elif res == 1:
+            print("权限错误")
+            mirai.throwError(miraiURL=miraiURL, session=session, target=group, errCode=400)
+
+    elif entrance in keyQuery:
+        try:
+            teamNumber = commandPart[1].strip()
+        except:
+            # List All
+            return
+
+        #teams = getTeams(db)
+        #if teamNumber > len(teams):
+        #    print('Team does not exist')
+        #    return
+        #
+        #printTeam(teams[teamNumber])
+
+    elif entrance in keyEnroll:
+        try:
+            teamNumber = commandPart[1].strip()
+        except:
+            # print('Please enter team number')
+            return
+        if type(teamNumber) is not int:
+            # print('Please enter team number')
+            return
+        try:
+            memberID = commandPart[2].strip()
+        except:
+            # print('Please enter memberID')
+            return
+
+        #teams = getTeams(db)
+        #if teamNumber > len(teams):
+        #    print('Team does not exist')
+        #    return
+        #
+        #enrollTeam(db, teams[teamNumber], memberID)
+
+    elif entrance in keyDisenroll:
+        return
+
 
 def createNewTeam(db, date, time, dungeon, comment, useBlackList,QQ):
     cursor = db.cursor()
@@ -50,3 +98,5 @@ def createNewTeam(db, date, time, dungeon, comment, useBlackList,QQ):
         cursor.execute(command)
     else:
         return 1 #权限错误
+
+    return 0
