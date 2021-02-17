@@ -92,7 +92,7 @@ def sendGroupMessage(miraiURL, session, target, content:str, messageType="TEXT",
     if messageType == "TEXT":
         temp = {"type": "Plain", "text": content}
         chain.append(temp)
-    elif messageType == "image":
+    elif messageType == "Image":
         temp = {"type": "Image", "url": content}
         chain.append(temp)
     requestData = {
