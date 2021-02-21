@@ -1,9 +1,18 @@
+手动突，任驰骋
+破楼兰宏：
 扬戈,神勇,骁勇,击水,劲风,牧云,风虎,战心,破楼兰,夜征,龙血,虎贲
 
-/cast 撼如雷
-/cast [nobuff:驰骋&nobuff:弹跳] 任驰骋
-/cast 突
+/cast [buff:牧云>1] 撼如雷
 /cast [rage<3|bufftime:破楼兰<1.5] 灭
+/cast [rage<4|tnobuff:流血|tbufftime:流血<3] 龙吟
 /cast [rage>4] 龙牙
-/cast [rage<4] 龙吟
+/cast 穿云
+
+渊宏：
+扬戈,神勇,骁勇,击水,劲风,牧云,风虎,战心,渊,夜征,龙血,虎贲
+手动渊 根据手感调整“bufftime:渊<X” （防止渊了一时回不来空打雷）
+/cast [bufftime:渊<9] 撼如雷
+/cast [rage<3] 灭
+/cast [rage<4|tnobuff:流血|tbufftime:流血<3] 龙吟
+/cast [rage>4] 龙牙
 /cast 穿云
