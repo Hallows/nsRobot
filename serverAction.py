@@ -47,7 +47,7 @@ class nsTeam():
 
     def printTeam(self, showMembers=False):
         msg = str(len(self.members)) + '/' + str(self.volume) + '人 ' + self.date + self.time + self.dungeon + self.comment
-        if showMembers:
+        if showMembers: # 是否显示队员
             msg += '\n'
             for i in range(len(self.members)):
                 msg += ' ' + self.members[i].printMember()
@@ -86,13 +86,12 @@ class nsQueue():
         if not self.teams:
             msg = '当前没有团队！'
         else:
-            if number is not None:
+            if number is not None: # 查询单个团队
                 try:
-                    print(str(number))
                     msg = self.teams[number].printTeam(showMembers=True)
                 except:
                     msg = '该团队不存在！'
-            else:
+            else: # 查询所有团队
                 msg = ''
                 for i in range(len(self.teams)):
                     msg += str(i+1) + '. ' + self.teams[i].printTeam() + '\n'
@@ -123,7 +122,7 @@ class nsQueue():
 
         return msg
 
-    def removeMember(self, iteamNumber, member):
+    def removeMember(self, teamNumber, member):
         try:
             msg = self.teams[teamNumber].removeMember(member)
         except:
@@ -181,7 +180,7 @@ def judge(miraiURL, session, db, message, qid, name, group, queue):
 
         try:
             vocation = commandPart[1].strip()
-            #assert(vocation in vocationList) TODO
+            #assert(vocation in vocationList) TODO 增加职业检查
         except:
             msg += '缺少角色职业 '
 
