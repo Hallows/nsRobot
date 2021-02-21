@@ -47,7 +47,7 @@ class nsTeam():
 
     def printTeam(self, showMembers=False):
         msg = str(len(self.members)) + '/' + str(self.volume) + '人 ' + self.date + self.time + self.dungeon + self.comment
-        if showMembers: # 是否显示队员
+        if showMembers:
             msg += '\n'
             for i in range(len(self.members)):
                 msg += ' ' + self.members[i].printMember()
@@ -86,12 +86,13 @@ class nsQueue():
         if not self.teams:
             msg = '当前没有团队！'
         else:
-            if number is not None: # 查询单个团队
+            if number is not None:
                 try:
+                    print(str(number))
                     msg = self.teams[number].printTeam(showMembers=True)
                 except:
                     msg = '该团队不存在！'
-            else: # 查询所有团队
+            else:
                 msg = ''
                 for i in range(len(self.teams)):
                     msg += str(i+1) + '. ' + self.teams[i].printTeam() + '\n'
@@ -122,7 +123,7 @@ class nsQueue():
 
         return msg
 
-    def removeMember(self, teamNumber, member):
+    def removeMember(self, iteamNumber, member):
         try:
             msg = self.teams[teamNumber].removeMember(member)
         except:
@@ -137,8 +138,7 @@ def judge(miraiURL, session, db, message, qid, name, group, queue):
 
     ############## Main ###################
     command = message[2:].strip() #把ns去掉后面开始分割这个指令
-    commandPart = command.split( ) #按照空格进行分割，但是后续要看看是不是加入更多的防傻判
-断
+    commandPart = command.split( ) #按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
     entrance = commandPart[0].strip()
 
     if entrance in keyNewTeam:
@@ -180,7 +180,7 @@ def judge(miraiURL, session, db, message, qid, name, group, queue):
 
         try:
             vocation = commandPart[1].strip()
-            #assert(vocation in vocationList) TODO 增加职业检查
+            #assert(vocation in vocationList) TODO
         except:
             msg += '缺少角色职业 '
 
@@ -239,21 +239,5 @@ def judge(miraiURL, session, db, message, qid, name, group, queue):
     elif entrance in keyAuthor:
         msg = '特别致谢：Magicat'
         mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
-
-
-def createNewTeam(db, date, time, dungeon, comment, useBlackList,QQ):
-    cursor = db.cursor()
-    command="SELECT * FROM ns_leader WHERE QQNumber = '{}' AND effective = 0".format(QQ)
-    cursor.execute(command)
-    #insert into ns_team(teamID,leaderID,dungeon,startTime,effective,allowBlackList,remark) VALUES(1023,1,'25YX达摩洞','2021-02-09 21:03:33',0,0,'25YX');
-    if cursor.rowcount != 0:
-        print("got correct leader!")
-        result = cursor.fetchone()
-
-        cursor.execute(command)
-    else:
-        return 1 #权限错误
-
-    return 0
 
 
