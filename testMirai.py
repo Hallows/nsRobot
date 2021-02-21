@@ -5,6 +5,7 @@ import time
 import requests
 import websocket
 import pymysql
+from serverAction import nsQueue
 try:
     import thread
 except ImportError:
@@ -42,8 +43,8 @@ def on_message(ws, message):
         incomeMessage = incomeJson['messageChain'][1]['text']
         temp='Get income message from GroupChat {} named {}(QQ:{}) with text: {}'.format(incomeGroupChatID,incomeMemberName,incomeQQ,incomeMessage)
         print(temp)
-        action.judge(miraiURL,session,db,message=incomeMessage, QQ=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
-        #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=True,ATQQ=incomeQQ)
+        action.judge(miraiURL,session,db,message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID, queue=queue)
+        #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
 
 def on_error(ws, error):
     print(error)
@@ -60,7 +61,8 @@ def on_open(ws):
 if __name__ == "__main__":
     initMirai()
     wsURL = 'ws://0.0.0.0:8080/message?sessionKey=' + session
-    db= pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+    db = None #pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+    queue = nsQueue()
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp(url=wsURL,
                             on_message = on_message,
@@ -68,3 +70,4 @@ if __name__ == "__main__":
                             on_close = on_close)
     ws.on_open = on_open
     ws.run_forever()
+

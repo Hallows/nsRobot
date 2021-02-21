@@ -2,7 +2,11 @@ import re
 from pyunit_time import Time
 
 
+<<<<<<< HEAD
 def magicFunc(date):
+=======
+def parseDate(date):
+>>>>>>> 2e5df3598ec9b0c101c20501686216b138f352f5
   res = re.findall('^\d{1,2}月\d{1,2}', date)
   if res:
     mm, dd = res[0].split('月')
