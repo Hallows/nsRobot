@@ -1,12 +1,26 @@
-from datetime import datetime
-import time
+import re
+from pyunit_time import Time
 
-def changeTime(date, time):
-    if date == '今天':
-        outdate = datetime.date.today()
-    if date == '明天':
-        outdate = yesterday = (datetime.date.today() + datetime.timedelta(days=1)).strftime('%Y%m%d')
-    if date == '后天':
-        outdate = yesterday = (datetime.date.today() + datetime.timedelta(days=2)).strftime('%Y%m%d')
-    #try:
-        
+
+def parseDate(date):
+  res = re.findall('^\d{1,2}月\d{1,2}', date)
+  if res:
+    mm, dd = res[0].split('月')
+    date = mm + '月' + dd + '日'
+
+  res = re.findall('^\d{1,2}-\d{1,2}', date)
+  if res:
+    mm, dd = res[0].split('-')
+    date = mm + '月' + dd + '日'
+
+  res = re.findall('^\d{1,2}\.\d{1,2}', date)
+  if res:
+    mm, dd = res[0].split('.')
+    date = mm + '月' + dd + '日'
+
+  try:
+    res = Time().parse(date)
+    for i in range(len(res)):
+      print(res[i]['keyDate'][5:10] + ' ')
+  except:
+    print('日期不存在！')
