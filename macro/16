@@ -1,15 +1,32 @@
-刀魂,绝返,分野,北漠,锋鸣,安疆,活脉,吓魂,从容,愤恨,蔑视,骇日
-
+双绝宏
+刀魂,绝返,分野,北漠,锋鸣,割裂,活脉,吓魂,从容,愤恨,蔑视,骇日
 盾宏：
 /cast [nobuff:血怒|bufftime:骇日>53.9] 血怒
-/cast [rage>45] 盾飞
+/cast [skill_energy:盾击=0] 盾压
+/cast 盾击
+/cast [last_skill=盾压] 盾飞
+
+刀宏：
+/cast [nobuff:血怒|bufftime:骇日>53.9] 血怒
+/cast [bufftime:盾飞>13.6] 劫刀
+/cast 斩刀
+/cast [buff:狂绝] 闪刀
+/cast 绝刀
+/cast [rage<9] 盾回
+
+炼狱分野宏
+刀魂,炼狱,分野,北漠,锋鸣,割裂,活脉,恋战,从容,愤恨,蔑视,骇日
+手动盾回
+盾宏：
+/cast [nobuff:血怒|bufftime:骇日>54] 血怒
 /cast 盾击
 /cast 盾压
 /cast 盾猛
-/cast 盾刀
+/cast [rage>44|rage>19&bufftime:血怒<3] 盾飞
 
 刀宏：
-/fcast 斩刀
-/cast [last_skill=斩刀|skill_notin_cd:绝刀] 绝刀
-/cast [rage>9] 劫刀
-/cast [rage<9] 盾回
+/cast [nobuff:血怒|buff:血怒<2] 血怒
+/cast [tbufftime:流血<3] 斩刀
+/cast [last_skill=斩刀] 闪刀
+/cast [bufftime:分野<1.4|nobuff:分野] 绝刀
+/cast 劫刀

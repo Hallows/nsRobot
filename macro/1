@@ -1,8 +1,8 @@
 青梅嗅,千里冰封,新妆,青梅,枕上,长依,望舒,元君,霜风,化冰,疾光,霜降
-
-/cast [tbufftime:急曲<2.8|tbuff:急曲<3|tnobuff:急曲|mana<0.3] 剑破虚空
-/cast 心鼓弦
+延迟高的情况下可以调高剑破的判定时间（tbufftime:急曲<X）
+/fcast [tnobuff:急曲|tbuff:急曲<3|tbufftime:急曲<2|mana<0.3] 剑破虚空
+/fcast 心鼓弦
+/fcast [buff:枕上=5] 玳弦急曲
 /cast 玳弦急曲
 /cast 剑破虚空
-/cast [tbuff:急曲=3] 江海凝光
-/cast 剑气长江
+/cast 江海凝光

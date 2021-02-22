@@ -1,16 +1,15 @@
 淘尽,清风,夜雨,景行,映波锁澜,怜光,层云,厌高,雾锁,残雪,如风,飞来闻踪
-
+手动玉虹、黄龙、重切轻啸日
 轻剑：
-/cast [skill:18682&rage>=70] 九溪弥烟
-/fcast [last_skill=九溪弥烟|noskill:18682&rage>=75] 啸日
-/cast [rage<75] 听雷
+/cast [nearby_enemy>0] 九溪弥烟
+/cast [rage>89] 啸日
+/cast 听雷
 
 重剑：
-/cast [buff:夜雨] 云飞玉皇
-/cast [buff:凤鸣|buff:莺鸣] 夕照雷峰
-/fcast [skill_energy:啸日=2&skill_notin_cd:九溪弥烟] 啸日
-/cast [rage<25] 莺鸣柳
-/cast 听雷
+/cast [buff:夜雨|buff:鹿卢] 云飞玉皇
+/cast [buff:凤鸣|rage>95] 夕照雷峰
+/cast [nobuff:鹿卢] 听雷
+/cast 夕照雷峰
 
 起手重剑爆发：
 /cast 飞来闻踪
