@@ -14,12 +14,12 @@ startY = 116
 font = ImageFont.truetype(init.FONT_PATH + 'msyh.ttc', 20, index=1)
 
 
-def GetDate(date: datetime):
-    print(date)
+def GetDate(dateRaw: str):
+    date = time.strptime(dateRaw, "%Y-%m-%d-%H:%M")
     week = {0: "周一", 1: "周二", 2: "周三",
             3: "周四", 4: "周五", 5: "周六", 6: "周日"}
-    dateStr = week[date.weekday()] + ' '
-    dateStr += time.strftime("%m月%d日 %H:%M", date.timetuple())
+    dateStr = week[date.tm_wday] + ' '
+    dateStr += time.strftime("%m月%d日 %H:%M", date)
     return dateStr
 
 
@@ -137,7 +137,6 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
     leaderinfo = cursor.fetchone()
 
     if len(internal) > 10 or len(external) > 10 or len(tank) + len(healer) > 5:
-        print(ceil(len(internal) / 2))
         num = max(ceil(len(internal) / 2),
                   ceil(len(external) / 2),
                   len(tank) + len(healer))
@@ -159,22 +158,23 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
         drawer.text(((canvasLength - w)//2, 10), tital,
                     fill=0x000000, font=titalFont)
 
-    datainfo = "（团队ID:" + teamdata[0].__str__() + "） " + GetDate(teaminfo[3])
+    datainfo = "（团队ID:" + \
+        teamdata[0].__str__() + "） " + GetDate(teaminfo[3] + '-' + teaminfo[4])
 
     time_w, time_h = font.getsize(datainfo)
 
-    team_w, team_h = font.getsize(teaminfo[6])
+    team_w, team_h = font.getsize(teaminfo[7])
 
     if team_w + time_w < boxLength * 5:
         drawer.text((startX, startY - time_h - 5),
                     datainfo, fill=0x000000, font=font)
         drawer.text((startX + boxLength * 5 - team_w, startY -
-                     team_h - 5), teaminfo[6], fill=0x000000, font=font)
+                     team_h - 5), teaminfo[7], fill=0x000000, font=font)
     else:
         drawer.text((startX, startY - time_h - 5),
                     datainfo, fill=0x000000, font=font)
         drawer.text((startX + time_w + 5, startY -
-                     team_h - 5), teaminfo[6], fill=0x000000, font=font)
+                     team_h - 5), teaminfo[7], fill=0x000000, font=font)
 
     for i in range(5):
         drawer.rectangle(
@@ -213,6 +213,7 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
 
     img.save(name)
 
+    db.close()
     return name
 
 
@@ -220,4 +221,3 @@ def GetImg(id: int) -> str:
     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
                          password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     return GenerateImage(db, GetMember(db, id))
-    db.close()
