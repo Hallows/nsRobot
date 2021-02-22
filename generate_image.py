@@ -23,12 +23,10 @@ def GetDate(date: datetime):
     return dateStr
 
 
-def DrawRectangal(img: Image.Image, x: int, y: int, info: list):
+def DrawRectangal(db: pymysql.connections.Connection, img: Image.Image, x: int, y: int, info: list):
 
     drawer = ImageDraw.Draw(img)
 
-    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
-                         password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     cursor = db.cursor()
 
     cursor.execute(
@@ -88,21 +86,17 @@ def GetRGB(id: str) -> tuple:
     return (r, g, b)
 
 
-def GetMember(id: int):
+def GetMember(db: pymysql.connections.Connection, id: int):
     # 读取数据库得到数据，返回列表
 
-    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
-                         password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     cursor = db.cursor()
     cursor.execute("SELECT * FROM ns_member WHERE teamID = " + id.__str__())
     memberlist = cursor.fetchall()
 
-    db.close()
-
     return (id, memberlist)
 
 
-def GenerateImage(teamdata: tuple):
+def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
     # 根据列表生成图片，返回文件名
 
     canvasLength = 1200
@@ -114,8 +108,6 @@ def GenerateImage(teamdata: tuple):
     healer = []
     tank = []
 
-    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
-                         password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     cursor = db.cursor()
 
     if not memberCount:
@@ -198,22 +190,22 @@ def GenerateImage(teamdata: tuple):
 
     for i in range(len(external)):
         if i % 2 == 0:
-            DrawRectangal(img, 0, i//2, external[i])
+            DrawRectangal(db, img, 0, i//2, external[i])
         elif i % 2 == 1:
-            DrawRectangal(img, 1, i//2, external[i])
+            DrawRectangal(db, img, 1, i//2, external[i])
 
     for i in range(len(internal)):
         if i % 2 == 0:
-            DrawRectangal(img, 2, i//2, internal[i])
+            DrawRectangal(db, img, 2, i//2, internal[i])
         elif i % 2 == 1:
-            DrawRectangal(img, 3, i//2, internal[i])
+            DrawRectangal(db, img, 3, i//2, internal[i])
 
     for i in range(len(tank)):
-        DrawRectangal(img, 4, i, tank[i])
+        DrawRectangal(db, img, 4, i, tank[i])
 
     temp = len(tank)
     for i in range(len(healer)):
-        DrawRectangal(img, 4, i+temp, healer[i])
+        DrawRectangal(db, img, 4, i+temp, healer[i])
 
     Time = time.strftime("%y-%m-%d-%H-%M-%S", time.localtime(time.time()))
 
@@ -225,4 +217,7 @@ def GenerateImage(teamdata: tuple):
 
 
 def GetImg(id: int) -> str:
-    return GenerateImage(GetMember(id))
+    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
+                         password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+    return GenerateImage(db, GetMember(db, id))
+    db.close()
