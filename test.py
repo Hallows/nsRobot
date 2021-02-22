@@ -1,5 +1,6 @@
 import generate_image
 import pymysql
 import init
+from jx3_query import *
 
-generate_image.GetImg(1001)
+print(getDaily())
