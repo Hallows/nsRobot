@@ -65,7 +65,7 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
 def getMental(mentalName):
     global db
     cursor = db.cursor()
-    command = "SELECT * FROM ns_mental WHERE acceptName LIKE '%{}%' OR mentalName='{}'".format(mentalName)
+    command = "SELECT * FROM ns_mental WHERE acceptName LIKE '%{}%' OR mentalName='{}'".format(mentalName,mentalName)
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
@@ -133,14 +133,14 @@ def delMember(teamID, QQ):
 #如果传入的团队不存在返回-1
 #如果传入的团长不是传入团队的发起者返回-2
 #数据库写入错误返回-3
-def delTeam(teamID, leaderID):
+def delTeam(teamID, leaderID:int):
     global db
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={}".format(teamID)
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
-        if leaderID == result[1]:
+        if int(leaderID) == int(result[1]):
             try:
                 command = "UPDATE ns_team SET effective=1 WHERE teamID={}".format(teamID)
                 cursor.execute(command)
