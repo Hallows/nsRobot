@@ -94,9 +94,61 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
             command = "INSERT INTO ns_member(teamID,memberQQ,memberNickname,mentalID,syana) VALUES({},'{}','{}',{},{})".format(teamID,QQ,nickName,mentalID,syana)
             cursor.execute(command)
             db.commit()
-            return 0
         except:
-            return -2#写入错误
+            return - 2  #写入错误
+        return 0
     else:
         return - 1  #传入QQ在此团队已经有报名记录
 
+#从指定团队中删除传入QQ的所有报名记录
+#-------输入---------
+#teamID:报团的团ID，由用户传入
+#QQ:用户的QQ号，通过mirai直接获取
+#-------输出---------
+#报名成功返回0
+#如果此QQ没有在此团队的报名记录则返回-1
+#如果传入参数错误返回-2
+def delMember(teamID, QQ):
+    global db
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+        try:
+            command = "DELETE FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
+            cursor.execute(command)
+            db.commit()
+        except:
+            return - 2  #数据库写入错误
+        return 0
+    else:
+        return - 1  #传入QQ没有在团队有报名记录
+
+#撤销开团
+#-------输入---------
+#teamID:报团的团ID，由用户传入
+#leaderID:团长的ID（只有自己才能撤销自己的开团）
+#-------输出---------
+#撤销成功返回0
+#如果传入的团队不存在返回-1
+#如果传入的团长不是传入团队的发起者返回-2
+#数据库写入错误返回-3
+def delTeam(teamID, leaderID):
+    global db
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_team WHERE teamID={}".format(teamID)
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+        result = cursor.fetchone()
+        if leaderID == result[1]:
+            try:
+                command = "UPDATE ns_team SET effective=1 WHERE teamID={}".format(teamID)
+                cursor.execute(command)
+                db.commit()
+            except:
+                return - 3  #数据库写入错误
+            return 0
+        else:
+            return - 2  #传入的团长ID不是开团者
+    else:
+        return -1#查无此团
