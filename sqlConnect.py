@@ -1,13 +1,23 @@
 import pymysql
+import init
+
+db = None
+
+#传入一个到数据库的连接
+#-------输入---------
+#mydb:有效的数据库连接
+def SQLConnect(mydb):
+    global db
+    db=mydb
 
 #验证是否存在某位团长
 #-------输入---------
-#db:有效的数据库连接
 #leaderQQ:团长的QQ号
 #-------输出---------
 #如果不存在此团长，或团长的审核状态为未通过，则返回-1
 #如果团长正常存在，返回该团长在数据库内的ID用于后续操作
-def has_Leader(db, leaderQQ):
+def has_Leader(leaderQQ):
+    global db
     cursor = db.cursor()
     command="SELECT * FROM ns_leader WHERE QQNumber = '{}' AND effective = 0".format(leaderQQ)
     cursor.execute(command)
@@ -19,7 +29,6 @@ def has_Leader(db, leaderQQ):
 
 #创建一个团队
 #-------输入---------
-#db:有效的数据库连接
 #date:开团日期（格式示例:'2021-02-09'）
 #Time:开团时间（格式示例:'21:05'）
 #dungeon:副本名称，字符串
@@ -29,7 +38,8 @@ def has_Leader(db, leaderQQ):
 #-------输出---------
 #如果开团成功，返回新开团队的团队ID
 #如果开团失败，返回-1
-def createNewTeam(db, date, time, dungeon, comment, leaderID, useBlackList=0):
+def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
+    global db
     cursor = db.cursor()
     try:
         command = "INSERT INTO ns_team(leaderID,dungeon,startDate,startTime,effective,allowBlackList,remark) VALUES({},'{}','{}','{}',0,{},'{}')".format(leaderID, dungeon, date, time, useBlackList, comment)
@@ -48,14 +58,15 @@ def createNewTeam(db, date, time, dungeon, comment, leaderID, useBlackList=0):
 
 #获取心法对应的心法ID
 #-------输入---------
-#db:有效的数据库连接
 #mentalName:输入的心法名称，将尝试在别名和正式命名中双重匹配
 #-------输出---------
 #如果不存在此心法则返回-1
 #如果匹配成功，返回此心法的ID
-def getMental(db, mentalName):
+def getMental(mentalName):
+    global db
     cursor = db.cursor()
     command = "SELECT * FROM ns_mental WHERE acceptName LIKE '%{}%' OR mentalName='{}'".format(mentalName)
+    cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
         return result[0]
@@ -64,7 +75,6 @@ def getMental(db, mentalName):
 
 #向指定团队添加报名记录
 #-------输入---------
-#db:有效的数据库连接
 #teamID:报团的团ID，由用户传入
 #QQ:用户的QQ号，通过mirai直接获取
 #nickName:用户输入的角色名
@@ -74,9 +84,11 @@ def getMental(db, mentalName):
 #报名成功返回0
 #如果此QQ已经有在此团队的报名记录则返回-1
 #如果传入参数错误返回-2
-def addMember(db, teamID, QQ, nickName, mentalID, syana=0):
+def addMember(teamID, QQ, nickName, mentalID, syana=0):
+    global db
     cursor = db.cursor()
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
+    cursor.execute(command)
     if cursor.rowcount == 0:
         try:
             command = "INSERT INTO ns_member(teamID,memberQQ,memberNickname,mentalID,syana) VALUES({},'{}','{}',{},{})".format(teamID,QQ,nickName,mentalID,syana)
