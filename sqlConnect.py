@@ -29,7 +29,7 @@ def has_Leader(db, leaderQQ):
 #-------输出---------
 #如果开团成功，返回新开团队的团队ID
 #如果开团失败，返回-1
-def createNewTeam(db, date, time, dungeon, comment, useBlackList=0,leaderID):
+def createNewTeam(db, date, time, dungeon, comment, leaderID, useBlackList=0):
     cursor = db.cursor()
     try:
         command = "INSERT INTO ns_team(leaderID,dungeon,startDate,startTime,effective,allowBlackList,remark) VALUES({},'{}','{}','{}',0,{},'{}')".format(leaderID, dungeon, date, time, useBlackList, comment)
@@ -74,7 +74,7 @@ def getMental(db, mentalName):
 #报名成功返回0
 #如果此QQ已经有在此团队的报名记录则返回-1
 #如果传入参数错误返回-2
-def addMember(db, teamID,QQ, nickName, mentalID, syana=0):
+def addMember(db, teamID, QQ, nickName, mentalID, syana=0):
     cursor = db.cursor()
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     if cursor.rowcount == 0:

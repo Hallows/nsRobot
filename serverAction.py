@@ -4,9 +4,10 @@
 #输入-name: 发来信息的昵称，用于后续相关确认通知，虽然大概率新版本不需要这样了
 #输入-group: 接收到信息的群聊ID，用于后续相关确认通知，虽然大概率新版本不需要这样了
 #输入-db: 数据库链接，在主程序建立到数据库的链接后直接将数据库作为对象传入即可
-import pymysql
+import sqlConnect as sql
 import MiraiConnnect as mirai
 import supportComponent as support
+
 
 keyNewTeam = ['开团','新建团队']
 keyQuery = ['查看团队', '查询团队', '查看', '查询']
@@ -15,7 +16,7 @@ keyDisenroll = ['取消报名', '退出']
 keyDeleteTeam = ['取消开团', '删除团队']
 keyHelp = ['帮助']
 keyAuthor = ['制作人员']
-#miraiURL = 'http://0.0.0.0:8080'
+
 
 def containKeys(text, keys=['pt', 'yx', '普通', '英雄', '25']):
     for key in keys:
@@ -24,18 +25,21 @@ def containKeys(text, keys=['pt', 'yx', '普通', '英雄', '25']):
 
     return False
 
+
 class nsMember():
     def __init__(self, name, qid, fst_vocation, snd_vocation=None):
         self.name = name
         self.qid = qid
         self.fst_vocation = fst_vocation
+        self.snd_vocation = snd_vocation
 
     def printMember(self):
         return self.name + '(' + self.fst_vocation + ')'
 
 
 class nsTeam():
-    def __init__(self, leader, date, time, dungeon, comment=''):
+    def __init__(self, teamID, leader, date, time, dungeon, comment=''):
+        self.teamID = teamID
         self.leader = leader
         self.date = date
         self.time = time
@@ -62,8 +66,11 @@ class nsTeam():
                     msg = member.name + '已经在该团队中！'
                     valid = False
             if valid:
-                self.members.append(member)
-                msg = member.name + '成功报名于' + self.date + self.time + self.dungeon + self.comment
+                if sql.addMember(self.teamID, member.qid, member.name, member.fst_vocation) < 0:
+                    msg = '数据库错误！'
+                else:
+                    self.members.append(member)
+                    msg = member.name + '成功报名于' + self.date + self.time + self.dungeon + self.comment
         else:
             msg = '该团队已满！'
 
@@ -98,10 +105,18 @@ class nsQueue():
 
         return msg
 
-    def createNewTeam(self, qid, date, time, dungeon, comment=''):
-        team = nsTeam(qid, date, time, dungeon, comment)
-        self.teams.append(team)
-        msg = '创建团队成功! ' + team.printTeam()
+    def createNewTeam(self, qid, date, time, dungeon, comment='', useBlackList=0):
+        leader = has_leader(qid)
+        if leader == -1:
+            msg = '团长错误！'
+        else:
+            teamID = sql.createNewTeam(date, time, dungeon, comment, leader, useBlackList)
+            if teamID == -1:
+                msg = '数据库错误！'
+            else:
+                team = nsTeam(teamID, qid, date, time, dungeon, comment)
+                self.teams.append(team)
+                msg = '创建团队成功! ' + team.printTeam()
 
         return msg
 
@@ -154,7 +169,7 @@ def judge(miraiURL, session, db, message, qid, name, group, queue):
         except:
             useBlackList = 0
 
-        msg = queue.createNewTeam(qid, date, time, dungeon, comment)
+        msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
         mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyQuery:
@@ -170,8 +185,8 @@ def judge(miraiURL, session, db, message, qid, name, group, queue):
         msg = ''
 
         try:
-            vocation = commandPart[1].strip()
-            #assert(vocation in vocationList) TODO 增加职业检查
+            vocation = sql.getMental(commandPart[1].strip())
+            assert(vocation != -1) # 检查心法是否存在
         except:
             msg += '缺少角色职业 '
 
