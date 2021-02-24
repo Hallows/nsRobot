@@ -62,7 +62,7 @@ def on_open(ws):
 
 if __name__ == "__main__":
     initMirai()
-    wsURL = 'ws://0.0.0.0:8080/message?sessionKey=' + session
+    wsURL = 'ws://0.0.0.0:8080/message?sessionKey=' + mirai.session
     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     SQLConnect(db)
     queue = nsQueue()

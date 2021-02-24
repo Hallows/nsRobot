@@ -211,8 +211,8 @@ def getTeam():
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE effective=0"
     cursor.execute(command)
+    out=[]
     if cursor.rowcount != 0:
-        out=[]
         results = cursor.fetchall()
         for row in results:
             teamID = row[0]
@@ -229,9 +229,7 @@ def getTeam():
             leaderName=result[2]
             temp = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment':comment}
             out.append(temp)
-        return out
-    else:
-        return out  #没有正在开的团
+    return out
         
 #扫描数据库并更新团队状态，清理所有过期团队
 #无输入
