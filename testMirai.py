@@ -23,15 +23,16 @@ miraiQQ = 2274927840
 session='newsession'
 
 def initMirai():
+    mirai.setMiraiURL(miraiURL)
     #获取版本
-    mirai.getVersion(miraiURL=miraiURL)
+    mirai.getVersion()
     #获取session
     global session
-    session=mirai.getAuth(miraiURL=miraiURL,miraiKey=miraiKey)
+    session=mirai.getAuth(miraiKey=miraiKey)
     #校验sesson并绑定bot
-    mirai.verify(miraiURL=miraiURL, session=session, botNumber=miraiQQ)
+    mirai.verify(botNumber=miraiQQ)
     #开启webSocket
-    mirai.startWebSocket(miraiURL=miraiURL, session=session)
+    mirai.startWebSocket()
     #释放sesson
     #mirai.release(miraiURL=miraiURL,session=session,botNumber=miraiQQ)
 
@@ -44,7 +45,7 @@ def on_message(ws, message):
         incomeMessage = incomeJson['messageChain'][1]['text']
         temp='Get income message from GroupChat {} named {}(QQ:{}) with text: {}'.format(incomeGroupChatID,incomeMemberName,incomeQQ,incomeMessage)
         print(temp)
-        action.judge(miraiURL, session, message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID, queue=queue)
+        action.judge(message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID, queue=queue)
         #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
 
 def on_error(ws, error):

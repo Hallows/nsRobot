@@ -157,7 +157,7 @@ class nsQueue():
         return msg
 
 
-def judge(miraiURL, session, message, qid, name, group, queue):
+def judge(message, qid, name, group, queue):
     if message[:2] != 'ns': #如果开头不是ns那么一切免谈，无事发生
         return
 
@@ -174,13 +174,17 @@ def judge(miraiURL, session, message, qid, name, group, queue):
             comment = commandPart[4].strip()
         except:
             mirai.throwError(target=group, errCode=100)
+<<<<<<< HEAD
             return
+=======
+>>>>>>> refs/remotes/origin/main
 
         try: #尝试解析是否指定了黑名单
             useBlackList = commandPart[5].strip()
         except:
             useBlackList = 0
 
+<<<<<<< HEAD
         #try:
         #    msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
         #except:
@@ -196,6 +200,9 @@ def judge(miraiURL, session, message, qid, name, group, queue):
             else:
                 msg = '创建团队成功！' + date + time + dungeon + comment
 
+=======
+        msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
+>>>>>>> refs/remotes/origin/main
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyQuery:
@@ -204,6 +211,7 @@ def judge(miraiURL, session, message, qid, name, group, queue):
         except:
             teamNumber = None
 
+<<<<<<< HEAD
         #try:
         #    msg = queue.printQueue(teamNumber)
         #except:
@@ -225,6 +233,10 @@ def judge(miraiURL, session, message, qid, name, group, queue):
                     g = res[i]
                     msg += g['leaderName']+' '+g['dungeon']+' '+g['startTime']+' '+g['comment']+'\n'
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+=======
+        msg = queue.printQueue(teamNumber)
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+>>>>>>> refs/remotes/origin/main
 
     elif entrance in keyEnroll:
         msg = ''
@@ -314,6 +326,7 @@ def judge(miraiURL, session, message, qid, name, group, queue):
         except:
             msg = '缺少团队编号'
 
+<<<<<<< HEAD
         if msg == '':
             team = None
             teams = sql.getTeam()
@@ -330,6 +343,8 @@ def judge(miraiURL, session, message, qid, name, group, queue):
                 else:
                     msg = '数据库错误！'
 
+=======
+>>>>>>> refs/remotes/origin/main
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyHelp:
@@ -339,4 +354,8 @@ def judge(miraiURL, session, message, qid, name, group, queue):
     elif entrance in keyAuthor:
         msg = '特别致谢：Magicat'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+<<<<<<< HEAD
+=======
+
+>>>>>>> refs/remotes/origin/main
 
