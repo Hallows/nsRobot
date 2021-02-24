@@ -6,7 +6,6 @@
 #输入-db: 数据库链接，在主程序建立到数据库的链接后直接将数据库作为对象传入即可
 import sqlConnect as sql
 import MiraiConnnect as mirai
-import supportComponent as support
 
 
 keyNewTeam = ['开团','新建团队']
