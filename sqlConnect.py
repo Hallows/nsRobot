@@ -192,7 +192,7 @@ def newLeader(QQ, nickName, activeTime):
 #获取所有在开团队
 #无输入
 #-------输出---------
-#如果当前没有在开团队，返回0
+#如果当前没有在开团队，返回空列表
 #如果存在在开团队，返回一个列表，其中每个团队独立一个字典，字典格式为：
 #团队ID-teamID-int
 #团长名字-leaderName-str
@@ -231,7 +231,7 @@ def getTeam():
             out.append(temp)
         return out
     else:
-        return 0  #没有正在开的团
+        return out  #没有正在开的团
         
 #扫描数据库并更新团队状态，清理所有过期团队
 #无输入
