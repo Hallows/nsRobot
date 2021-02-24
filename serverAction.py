@@ -172,6 +172,8 @@ def judge(message, qid, name, group, queue):
             time = parseTime(commandPart[2].strip())
             dungeon = commandPart[3].strip()
             comment = commandPart[4].strip()
+            assert(date != -1)
+            assert(time != -1)
         except:
             mirai.throwError(target=group, errCode=100)
             return
