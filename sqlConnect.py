@@ -1,5 +1,6 @@
 import pymysql
 import init
+import time as pytime
 
 db = None
 
@@ -84,9 +85,14 @@ def getMental(mentalName):
 #报名成功返回0
 #如果此QQ已经有在此团队的报名记录则返回-1
 #如果传入参数错误返回-2
+#如果团队不存在返回-3（过期的团队视为不存在）
 def addMember(teamID, QQ, nickName, mentalID, syana=0):
     global db
     cursor = db.cursor()
+    command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
+    cursor.execute(command)
+    if cursor.rowcount == 0:
+        return -3
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
     if cursor.rowcount == 0:
@@ -151,4 +157,97 @@ def delTeam(teamID, leaderID:int):
         else:
             return - 2  #传入的团长ID不是开团者
     else:
-        return -1#查无此团
+        return - 1  #查无此团
+#添加一条团长申请
+#-------输入---------
+#QQ:新团长的QQ，从mirai获取
+#nickName:新团长的昵称
+#activeTime:活跃时间
+#-------输出---------
+#添加成功返回0
+#如果此QQ已经报名但是没有通过审核，返回-1
+#如果此QQ已经是通过审核的团长，返回-2
+def newLeader(QQ, nickName, activeTime):
+    global db
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_leader WHERE QQNumber={} AND effective=1".format(QQ)
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+        return - 1
+    else:
+        command = "SELECT * FROM ns_leader WHERE QQNumber={}".format(QQ)
+        cursor.execute(command)
+        if cursor.rowcount != 0:
+            return - 2
+        else:
+            command = "INSERT INTO ns_leader(QQNumber,nickName,activeTime,effective) VALUES('{}','{}','{}',1)".format(QQ, nickName, activeTime)
+            cursor.execute(command)
+            db.commit()
+            return 0
+
+#获取所有在开团队
+#无输入
+#-------输出---------
+#如果当前没有在开团队，返回0
+#如果存在在开团队，返回一个列表，其中每个团队独立一个字典，字典格式为：
+#团队ID-teamID-int
+#团长名字-leaderName-str
+#团队名称-dungeon-str
+#开组时间-startTime-str(仅返回月日时分)
+#注释-comment-str
+#
+#返回的列表样例如下所示：
+#[
+#   {'teamID': 1000, 'leaderName': '渡空离', 'dungeon': 'test', 'startTime': '02-24 11:00', 'comment': 'test'},
+#   {'teamID': 1001, 'leaderName': '辰韶', 'dungeon': '达摩洞', 'startTime': '12-31 21:00', 'comment': '25pt达摩洞，来十人熟手'}
+# ]
+def getTeam():
+    global db
+    updateDB()
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_team WHERE effective=0"
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+        out=[]
+        results = cursor.fetchall()
+        for row in results:
+            teamID = row[0]
+            leaderID = row[1]
+            dungeon = row[2]
+            date = row[3]
+            time = row[4]
+            comment=row[7]
+            startTime = "%s %s" % (date, time)
+            startTime = startTime[5:]
+            command = "SELECT * FROM ns_leader WHERE id={}".format(leaderID)
+            cursor.execute(command)
+            result = cursor.fetchone()
+            leaderName=result[2]
+            temp = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment':comment}
+            out.append(temp)
+        return out
+    else:
+        return 0  #没有正在开的团
+        
+#扫描数据库并更新团队状态，清理所有过期团队
+#无输入
+#无输出
+def updateDB():
+    global db
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_team WHERE effective=0"
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+        results = cursor.fetchall()
+        for row in results:
+            teamID=row[0]
+            date = row[3]
+            time = row[4]
+            dbtime = "%s %s"%(date,time)
+            nowtime = pytime.strftime("%Y-%m-%d %H:%M", pytime.localtime())
+            if dbtime < nowtime:
+                closeTeam = "UPDATE ns_team SET effective=1 WHERE teamID={}".format(teamID)
+                cursor.execute(closeTeam)
+                db.commit()
+    else:
+        return
