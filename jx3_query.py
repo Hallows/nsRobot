@@ -44,7 +44,7 @@ def getDaily(server=init.SERVER):
     name = time.strftime("%y-%m-%d-%H-%M-%S-daily.jpg", time.localtime())
     img.save(init.IMAGE_PATH + name)
 
-    return init.IMAGE_PATH + name
+    return name
 
 
 def getGold(server=init.SERVER):
@@ -79,7 +79,7 @@ def getGold(server=init.SERVER):
     name = time.strftime("%y-%m-%d-%H-%M-%S-gold.jpg", time.localtime())
     img.save(init.IMAGE_PATH + name)
 
-    return init.IMAGE_PATH + name
+    return name
 
 
 def getServer(server=init.SERVER):
@@ -112,7 +112,7 @@ def getServer(server=init.SERVER):
     name = time.strftime("%y-%m-%d-%H-%M-%S-server.jpg", time.localtime())
     img.save(init.IMAGE_PATH + name)
 
-    return init.IMAGE_PATH + name
+    return name
 
 
 def getSand(server=init.SERVER):
@@ -125,7 +125,7 @@ def getSand(server=init.SERVER):
     name = time.strftime("%y-%m-%d-%H-%M-%S-sand.jpg", time.localtime())
     with open(init.IMAGE_PATH + name, 'wb') as i:
         i.write(img)
-    return init.IMAGE_PATH + name
+    return name
 
 
 def getFlower(name: str):

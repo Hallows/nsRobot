@@ -6,7 +6,7 @@ dbName = 'ns_db'
 dbCharset = 'utf8'
 
 MENTAL_ICON_PATH = "./mental_icon/"
-IMAGE_PATH = "./temp/img/"
+IMAGE_PATH = "/home/ubuntu/mirai/data/net.mamoe.mirai-api-http/images/"
 FONT_PATH = "./font/"
 MACRO_PATH = "./macro/"
 

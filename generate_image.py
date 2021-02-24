@@ -209,9 +209,9 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
 
     Time = time.strftime("%y-%m-%d-%H-%M-%S", time.localtime(time.time()))
 
-    name = init.IMAGE_PATH + Time + '-' + teamdata[0].__str__() + '.jpg'
+    name = Time + '-' + teamdata[0].__str__() + '.jpg'
 
-    img.save(name)
+    img.save(init.IMAGE_PATH + name)
 
     db.close()
     return name
