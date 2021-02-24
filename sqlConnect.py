@@ -17,7 +17,7 @@ def SQLConnect(mydb):
 #-------输出---------
 #如果不存在此团长，或团长的审核状态为未通过，则返回-1
 #如果团长正常存在，返回该团长在数据库内的ID用于后续操作
-def has_Leader(leaderQQ):
+def hasLeader(leaderQQ):
     global db
     cursor = db.cursor()
     command="SELECT * FROM ns_leader WHERE QQNumber = '{}' AND effective = 0".format(leaderQQ)

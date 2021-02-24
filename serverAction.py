@@ -109,7 +109,7 @@ class nsQueue():
         return msg
 
     def createNewTeam(self, qid, date, time, dungeon, comment='', useBlackList=0):
-        leader = sql.has_leader(qid)
+        leader = sql.hasLeader(qid)
         if leader == -1:
             msg = '团长错误！'
         else:
@@ -188,7 +188,7 @@ def judge(message, qid, name, group, queue):
         #except:
         #    msg = '新建团队失败'
 
-        leader = sql.has_leader(qid)
+        leader = sql.hasLeader(qid)
         if leader == -1:
             msg = '团长错误！'
         else:
