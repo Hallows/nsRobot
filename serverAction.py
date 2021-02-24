@@ -156,7 +156,7 @@ class nsQueue():
         return msg
 
 
-def judge(miraiURL, session, message, qid, name, group, queue):
+def judge(message, qid, name, group, queue):
     if message[:2] != 'ns': #如果开头不是ns那么一切免谈，无事发生
         return
 
@@ -172,7 +172,7 @@ def judge(miraiURL, session, message, qid, name, group, queue):
             dungeon = commandPart[3].strip()
             comment = commandPart[4].strip()
         except:
-            mirai.throwError(miraiURL=miraiURL, session=session, target=group, errCode=100)
+            mirai.throwError(target=group, errCode=100)
 
         try: #尝试解析是否指定了黑名单
             useBlackList = commandPart[5].strip()
@@ -180,7 +180,7 @@ def judge(miraiURL, session, message, qid, name, group, queue):
             useBlackList = 0
 
         msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
-        mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyQuery:
         try:
@@ -189,7 +189,7 @@ def judge(miraiURL, session, message, qid, name, group, queue):
             teamNumber = None
 
         msg = queue.printQueue(teamNumber)
-        mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyEnroll:
         msg = ''
@@ -216,7 +216,7 @@ def judge(miraiURL, session, message, qid, name, group, queue):
         except:
             msg += '新建成员错误'
 
-        mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyDisenroll:
         msg = ''
@@ -237,7 +237,7 @@ def judge(miraiURL, session, message, qid, name, group, queue):
         except:
             msg += '新建成员错误'
 
-        mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyDeleteTeam:
         try:
@@ -246,14 +246,14 @@ def judge(miraiURL, session, message, qid, name, group, queue):
         except:
             msg = '缺少团队编号'
 
-        mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyHelp:
         msg = '制作中WIP'
-        mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyAuthor:
         msg = '特别致谢：Magicat'
-        mirai.sendGroupMessage(miraiURL, session, target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
 

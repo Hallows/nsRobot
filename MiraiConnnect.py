@@ -2,9 +2,19 @@ import requests
 import json
 import sys
 
+miraiURL = None
+session = None
+
+#设置miraiURL
+def setMiraiURL(url):
+    global miraiURL
+    miraiURL = url
+    return
+
 #获取mirai版本
 #输入-miraiURL: mirai的HTTPAPI地址
-def getVersion(miraiURL):
+def getVersion():
+    global miraiURL
     url=miraiURL+'/about'
     res = requests.get(url=url)
     jsonData = res.json()
@@ -14,26 +24,27 @@ def getVersion(miraiURL):
         raise SystemExit('ERROR: Connect failed, programme exit')
 
 #获取授权码
-#输入-miraiURL: mirai的HTTPAPI地址
 #输入-miraiKey: mirai的默认连接key，从配置文件中获取
-#输出-sessionKey: 返回的有效的session
-def getAuth(miraiURL, miraiKey):
+#输出-session获取成功返回0
+def getAuth(miraiKey):
+    global miraiURL
+    global session
     url=miraiURL+'/auth'
     requestData = {'authKey': miraiKey}
     res = requests.post(url=url,json=requestData)
     jsonData = res.json()
     if jsonData['code'] == 0:
         print('Authorize Success! Got AuthCode {}'.format(jsonData['session']))
-        sessionKey = jsonData['session']
-        return sessionKey
+        session = jsonData['session']
+        return 0
     else:
         raise SystemExit('ERROR: Authorize Failed with code {} and the authKey is {}'.format(jsonData['code'], requestData['authKey']))
 
 #校验sesson并绑定bot
-#输入-miraiURL: mirai的HTTPAPI地址
-#输入-session: 有效的session，通过getAuth()获取
 #输入-botNumber: 待绑定的机器人的QQ号
-def verify(miraiURL,session,botNumber):
+def verify(botNumber):
+    global miraiURL
+    global session
     requestData = {
         'sessionKey': session,
         'qq': botNumber
@@ -48,10 +59,10 @@ def verify(miraiURL,session,botNumber):
 
 
 #释放sesson并清除bot的信息缓存(程序结束前调用否则可能导致溢出)
-#输入-miraiURL: mirai的HTTPAPI地址
-#输入-session: 有效的session，通过getAuth()获取
 #输入-botNumber: 待绑定的机器人的QQ号
-def release(miraiURL,session,botNumber):
+def release(botNumber):
+    global miraiURL
+    global session
     requestData = {
         'sessionKey': session,
         'qq': botNumber
@@ -65,9 +76,9 @@ def release(miraiURL,session,botNumber):
         raise SystemExit('ERROR: Release Failed!')
 
 #设置指定的session所对应的对话开启webSocket代理服务（默认全局关闭）
-#输入-miraiURL: mirai的HTTPAPI地址
-#输入-session: 待开启WS服务的有效session，通过getAuth()获取
-def startWebSocket(miraiURL, session):
+def startWebSocket():
+    global miraiURL
+    global session
     requestData = {
         'sessionKey': session,
         "enableWebsocket": True
@@ -77,14 +88,14 @@ def startWebSocket(miraiURL, session):
     print('WebSocketStarted!')
 
 #对指定群聊发送信息
-#输入-miraiURL: mirai的HTTPAPI地址
-#输入-session: 待开启WS服务的有效session，通过getAuth()获取
 #输入-target：目标群聊的群号
 #输入-content：若需要发送文字则为文字内容，若需要发送图片为图片URL
 #输入-messageTye：默认为TEXT即文字，也可接受Image即图片
 #输入-needAT：是否需要在发送内容前at指定人，默认为0即不at
 #输入-ATQQ：如果需要at，传入uint型的QQ号，注意！不是字符串！
-def sendGroupMessage(miraiURL, session, target, content:str, messageType="TEXT", needAT=False, ATQQ=None):
+def sendGroupMessage(target, content: str, messageType="TEXT", needAT=False, ATQQ=None):
+    global miraiURL
+    global session
     chain=[]
     if needAT:
         temp={"type": "At", "target": ATQQ, "display": "@来源"}
@@ -111,7 +122,9 @@ def sendGroupMessage(miraiURL, session, target, content:str, messageType="TEXT",
 #错误码-含义
 #100-参数错误
 #400-权限错误
-def throwError(miraiURL, session, target,errCode):
+def throwError(target, errCode):
+    global miraiURL
+    global session
     chain = []
     if errCode == 100:
         temp = {"type": "Plain", "text": "指令参数错误，请使用 ns帮助 查看所有指令列表"}
