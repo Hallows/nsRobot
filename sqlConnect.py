@@ -47,7 +47,8 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
         db.commit()
         command = "SELECT * FROM ns_team WHERE startDate='{}' AND leaderID={} AND startTime='{}'".format(date, leaderID, time)
         cursor.execute(command)
-    except:
+    except Exception as ex:
+        print(str(ex))
         db.rollback()
         return -1 #开团失败
     if cursor.rowcount != 0:
@@ -94,7 +95,8 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
             command = "INSERT INTO ns_member(teamID,memberQQ,memberNickname,mentalID,syana) VALUES({},'{}','{}',{},{})".format(teamID,QQ,nickName,mentalID,syana)
             cursor.execute(command)
             db.commit()
-        except:
+        except Exception as ex:
+            print(str(ex))
             return - 2  #写入错误
         return 0
     else:
@@ -118,7 +120,8 @@ def delMember(teamID, QQ):
             command = "DELETE FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
             cursor.execute(command)
             db.commit()
-        except:
+        except Exception as ex:
+            print(str(ex))
             return - 2  #数据库写入错误
         return 0
     else:
@@ -145,7 +148,8 @@ def delTeam(teamID, leaderID:int):
                 command = "UPDATE ns_team SET effective=1 WHERE teamID={}".format(teamID)
                 cursor.execute(command)
                 db.commit()
-            except:
+            except Exception as ex:
+                print(str(ex))
                 return - 3  #数据库写入错误
             return 0
         else:
