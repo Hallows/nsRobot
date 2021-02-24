@@ -169,7 +169,7 @@ def judge(message, qid, name, group, queue):
     if entrance in keyNewTeam:
         try: #尝试解析参数，如果出错说明输入参数有误
             date = parseDate(commandPart[1].strip())
-            time = commandPart[2].strip()
+            time = parseTime(commandPart[2].strip())
             dungeon = commandPart[3].strip()
             comment = commandPart[4].strip()
         except:
