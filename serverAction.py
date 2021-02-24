@@ -78,7 +78,8 @@ class nsTeam():
 
     def removeMember(self, member):
         for i in range(len(self.members)):
-            if self.members[i].name == member.name:
+            if self.members[i].qid == member.qid:
+                sql.delMember(self.teamID, qid)
                 self.members.remove(m)
         msg = member.name + '成功取消报名！'
 
@@ -96,7 +97,8 @@ class nsQueue():
             if number is not None: # 查询指定团队
                 try:
                     msg = self.teams[number].printTeam(showMembers=True)
-                except:
+                except Exception as ex:
+                    print(str(ex))
                     msg = '该团队不存在！'
             else: # 查询所有团队
                 msg = ''
@@ -121,18 +123,25 @@ class nsQueue():
         return msg
 
     def removeTeam(self, qid, number):
-        if self.teams[number].leader != qid:
-            msg = '删除团队失败，没有该权限！'
+        if number < 0 or number > len(self.teams)-1:
+            msg = '该团队不存在！'
         else:
-            self.teams.remove(self.teams[number])
-            msg = '删除团队成功！'
+            if qid != self.teams[number].leader:
+                msg = '删除团队失败，没有该权限！'
+            else:
+                if sql.delTeam(self.teams[number].teamID, qid) == 0:
+                    self.teams.remove(self.teams[number])
+                    msg = '删除团队成功！'
+                else:
+                    msg = '数据库错误！'
 
         return msg
 
     def addMember(self, teamNumber, member):
         try:
             msg = self.teams[teamNumber].addMember(member)
-        except:
+        except Exception as ex:
+            print(str(ex))
             msg = '该团队不存在！'
 
         return msg
@@ -140,13 +149,14 @@ class nsQueue():
     def removeMember(self, teamNumber, member):
         try:
             msg = self.teams[teamNumber].removeMember(member)
-        except:
+        except Exception as ex:
+            print(str(ex))
             msg = '该团队不存在！'
 
         return msg
 
 
-def judge(miraiURL, session, db, message, qid, name, group, queue):
+def judge(miraiURL, session, message, qid, name, group, queue):
     if message[:2] != 'ns': #如果开头不是ns那么一切免谈，无事发生
         return
 
@@ -216,13 +226,13 @@ def judge(miraiURL, session, db, message, qid, name, group, queue):
         except:
             msg += '缺少团队编号 '
 
-        try:
-            memberName = commandPart[2].strip()
-        except:
-            msg += '缺少角色名称 '
+        #try:
+        #    memberName = commandPart[2].strip()
+        #except:
+        #    msg += '缺少角色名称 '
 
         try:
-            member = nsMember(memberName, qid, None)
+            member = nsMember('', qid, None)
             msg = queue.removeMember(teamNumber, member)
         except:
             msg += '新建成员错误'
