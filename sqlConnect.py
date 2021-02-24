@@ -253,3 +253,41 @@ def updateDB():
                 db.commit()
     else:
         return
+
+#获取指定团队的状态
+#-------输入---------
+#teamID:团队ID
+#-------输出---------
+#如果团队不存在，返回空字典
+#如果存在团队，返回一个字典，格式为：
+#团队ID-teamID-int
+#团长名字-leaderName-str
+#团队名称-dungeon-str
+#开组时间-startTime-str(仅返回月日时分)，例如02-24 19:00
+#注释-comment-str
+#团长ID-leaderID-str
+#开团日期-date-格式：2021-02-24
+#开团时间-time-格式：11:00
+def getInfo(teamID):
+    global db
+    out={}
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_team WHERE teamID={}".format(teamID)
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+        result = cursor.fetchone()
+        teamID = row[0]
+        leaderID = row[1]
+        dungeon = row[2]
+        date = row[3]
+        time = row[4]
+        comment=row[7]
+        startTime = "%s %s" % (date, time)
+        startTime = startTime[5:]
+        command = "SELECT * FROM ns_leader WHERE id={}".format(leaderID)
+        cursor.execute(command)
+        result = cursor.fetchone()
+        leaderName = result[2]
+        out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment':comment,'leaderID':leaderID,'startDate':date,'startTime':time}
+    else:
+        return out
