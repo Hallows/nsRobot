@@ -111,7 +111,7 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
     cursor = db.cursor()
 
     if not memberCount:
-        return "No Team"
+        return -1
 
     for member in teamdata[1]:
         cursor.execute(
@@ -217,7 +217,7 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
     return name
 
 
-def GetImg(id: int) -> str:
+def GetImg(id: int):
     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
                          password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     return GenerateImage(db, GetMember(db, id))
