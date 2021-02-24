@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 url = "https://jx3api.com/api/"
 
-font = ImageFont.truetype(init.FONT_PATH + 'hwxk.ttf', 30)
+font = ImageFont.truetype(init.FONT_PATH + 'msyh.ttc', 30, index=0)
 week = {0: "星期一", 1: "星期二", 2: "星期三",
         3: "星期四", 4: "星期五", 5: "星期六", 6: "星期日"}
 
@@ -52,7 +52,7 @@ def getGold(server=init.SERVER):
     r = requests.post(url + 'gold', data)
     r_data = json.loads(r.text)
 
-    if r_data['code'] == 0:
+    if r_data['code'] != 1:
         return ''
 
     offical = float(r_data['data']['wanbaolou']).__int__()
@@ -87,8 +87,8 @@ def getServer(server=init.SERVER):
     r = requests.post(url + 'server', data)
     r_data = json.loads(r.text)
 
-    if r_data['code'] == 0:
-        return
+    if r_data['code'] != 1:
+        return ''
 
     content = "服务器：" + server + '\n' + '状    态：\n'
 
@@ -119,6 +119,10 @@ def getSand(server=init.SERVER):
     data = {"server": server, "token": "153166341"}
     r = requests.post(url + 'sand', data)
     r_data = json.loads(r.text)
+
+    if r_data['code'] != 1:
+        return ''
+
     img_url = r_data['data']['url']
     img = requests.get(img_url).content
 
@@ -129,12 +133,55 @@ def getSand(server=init.SERVER):
 
 
 def getFlower(name: str):
-    data = {"server": "天鹅坪",
+    data = {"server": init.SERVER,
             "flower": name,
             "token": "153166341"}
     r = requests.post(url + 'flower', data)
     r_data = json.loads(r.text)
-    return r_data['data']
+    if r_data['code'] != 1:
+        return r_data
+
+    i = 0
+    w, h = 500, 1000
+
+    content = init.SERVER + " · " + name + "\n广陵邑：\n"
+    i += 2
+    for item in r_data['data']['广陵邑']:
+        i += 3
+        content += '  ' + item['name'] + '(' + item['color'] + ')：\n    '
+        for line in item['line']:
+            content += line + ' '
+        content += '线\n     '
+        content += item['price'].__str__() + '倍\n'
+
+    content += "枫叶泊·天苑：\n"
+    i += 1
+    for item in r_data['data']['枫叶泊·天苑']:
+        i += 3
+        content += '  ' + item['name'] + '(' + item['color'] + ')：\n    '
+        for line in item['line']:
+            content += line + ' '
+        content += '线\n     '
+        content += item['price'].__str__() + '倍\n'
+
+    content += "枫叶泊·乐苑：\n"
+    i += 1
+    for item in r_data['data']['枫叶泊·乐苑']:
+        i += 3
+        content += '  ' + item['name'] + '(' + item['color'] + ')：\n    '
+        for line in item['line']:
+            content += line + ' '
+        content += '线\n     '
+        content += item['price'].__str__() + '倍\n'
+
+    img = Image.new("RGB", (w, 37*i), 0xffffff)
+    drawer = ImageDraw.Draw(img)
+    drawer.text((10, 10), content, 0x000000, font)
+
+    name = time.strftime("%y-%m-%d-%H-%M-%S-flower.jpg", time.localtime())
+    img.save(init.IMAGE_PATH + name)
+
+    return name
 
 
 def getExam(subject: str):
@@ -146,7 +193,30 @@ def getExam(subject: str):
     r_data = json.loads(r.text)
     if r_data['code'] == 0:
         return ''
-    return r_data['data']
+
+    w, h = 0, 0
+    i = 0
+    content = ''
+
+    for question in r_data['data']:
+        content += question['question'] + '\n' + \
+            '  ' + question['answer'] + '\n\n'
+        if max(font.getsize(question['question'])[0], font.getsize('  ' + question['answer'])[0]) > w:
+            w = max(font.getsize(question['question'])[0], font.getsize(
+                '  ' + question['answer'])[0])
+
+        i += 3
+
+    h = i * 37
+
+    img = Image.new("RGB", (w + 20, h), 0xffffff)
+    drawer = ImageDraw.Draw(img)
+    drawer.text((10, 10), content, 0x000000, font)
+
+    name = time.strftime("%y-%m-%d-%H-%M-%S-exam.jpg", time.localtime())
+    img.save(init.IMAGE_PATH + name)
+
+    return name
 
 
 def getEye(mental: str):
@@ -159,5 +229,27 @@ def getEye(mental: str):
     r_data = json.loads(r.text)
     if r_data['code'] == 0:
         return ''
-    print(r_data)
-    return r_data
+
+    w, h = 0, 0
+    i = 0
+
+    content = r_data['name'] + '\n'
+    i += 1
+
+    for level in r_data['data']:
+        content += level['level'] + '：' + level['result'] + '\n'
+        if font.getsize(level['level'] + '：' + level['result'] + '\n')[0] > w:
+            w = font.getsize(level['level'] + '：' + level['result'] + '\n')[0]
+
+        i += 1
+
+    h = i * 37
+
+    img = Image.new("RGB", (w+20, h + 20), 0xffffff)
+    drawer = ImageDraw.Draw(img)
+    drawer.text((10, 10), content, 0x000000, font)
+
+    name = time.strftime("%y-%m-%d-%H-%M-%S-eye.jpg", time.localtime())
+    img.save(init.IMAGE_PATH + name)
+
+    return name
