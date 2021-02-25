@@ -116,9 +116,14 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
 #报名成功返回0
 #如果此QQ没有在此团队的报名记录则返回-1
 #如果传入参数错误返回-2
+#如果团队不存在或者已过期，返回-3
 def delMember(teamID, QQ):
     global db
     cursor = db.cursor()
+    command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
+    cursor.execute(command)
+    if cursor.rowcount == 0:
+        return -3 #团队不存在或已过期
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
     if cursor.rowcount != 0:
