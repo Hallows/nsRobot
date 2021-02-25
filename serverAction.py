@@ -216,7 +216,8 @@ def judge(message, qid, name, group, queue):
                         g['startTime'], g['comment'])
                 msg += '--------------------------- \n'
 
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~", messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
     
     elif entrance in keyQuery:
         try:
@@ -369,7 +370,8 @@ def judge(message, qid, name, group, queue):
             except:
                 msg = '心法文件错误'
        
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了', messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
 
     elif entrance in keyHelp:
         msg = '制作中WIP'
