@@ -214,7 +214,7 @@ def judge(message, qid, name, group, queue):
                 msg += '{}. ID：{} {} {} {} {} \n'.format(str(i+1), 
                         g['teamID'], g['leaderName'], g['dungeon'], 
                         g['startTime'], g['comment'])
-                msg += '---------------------------'
+                msg += '--------------------------- \n'
 
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
     
