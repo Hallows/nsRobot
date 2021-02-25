@@ -1,0 +1,21 @@
+【新思路：青冥谒宫】奇穴：
+海隅,扶桑,羽彰,清源,太息,谒宫,罔象,怅归,青冥,驰行,梦悠,濯流
+
+地宏：
+/fcast 翼绝云天
+/fcast 振翅图南
+/cast 跃潮斩波
+/cast [buff:梦悠&nobuff:太息&skill_energy:物化天行>0] 浮游天地
+/cast 木落雁归
+/cast [buff:太息] 海运南冥
+/cast 击水三千
+
+天宏：
+/fcast 翼绝云天
+/fcast 物化天行
+/cast 溟海御波
+/cast [nearby_enemy>0] 海运南冥
+/cast 逐波灵游
+/cast [bufftime:浮游天地<26&buff:梦悠] 浮游天地·落地
+
+地面手打定波溟海御波

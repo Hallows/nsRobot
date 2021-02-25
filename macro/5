@@ -1,0 +1,23 @@
+弹指,雪中行,倚天,焚玉,青歌,青冠,清流,雪弃,兰舟,梦歌,踏歌,涓流
+
+1起手宏：
+/cast 水月无间
+/cast 乱洒青荷
+/cast [tbuff:商阳指&tbuff:兰摧玉折] 玉石俱焚
+/cast [last_skill=阳明指&tnobuff:商阳指] 商阳指
+/cast [tnobuff:711&buff:乱洒青荷] 阳明指
+
+2挂毒宏：
+/cast [tbufftime:商阳指>12&tbufftime:兰摧玉折>12] 玉石俱焚
+/cast [tnobuff:兰摧玉折] 兰摧玉折
+/cast [last_skill=兰摧玉折] 钟林毓秀
+/cast [tnobuff:商阳指] 商阳指
+
+3填充宏：
+/cast 水月无间
+/fcast [tbufftime:兰摧玉折<3|tbufftime:钟林毓秀<3|tbufftime:商阳指<3] 芙蓉并蒂
+/cast [last_skill=芙蓉并蒂] 玉石俱焚
+/cast 快雪时晴
+
+以下内容转自浮烟大大：
+先1，看到玉石爆了切2，2用到把dot补完就一直3，3里面会芙蓉刷新一次dot，第2次就没法刷新了，那会又得切2，补完再3

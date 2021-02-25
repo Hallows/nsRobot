@@ -1,0 +1,29 @@
+打净世破魔击的宏：（有dps）
+血泪成悦,慈悲心,寒月耀,无明业火,超凡入圣,极乐引,纵遇善缘,妙镜惊寂,昭昭,日月同辉,怜世人,微妙风
+打生死劫的宏：（dps基本没有）
+圣光明,慈悲心,寂灭,月尽天明,超凡入圣,极乐引,纵遇善缘,妙镜惊寂,渡厄力,日月同辉,无量妙境,心火叹
+
+净世破魔击宏：
+1.需要你手动打断的：
+/cast [tnobuff:戒火|tbufftime:戒火<1] 戒火斩
+/cast 净世破魔击
+/cast [sun<61] 烈日斩
+/cast [buff:日月同辉&moon<61] 赤日轮
+/cast 银月斩
+/cast 赤日轮
+2.不需要你手动打断的：
+/cast [tnobuff:戒火] 戒火斩
+/cast [sun<100&moon<100] 寒月耀
+/cast 净世破魔击
+/cast [sun<61] 烈日斩
+/cast [nobuff:日月同辉] 银月斩
+/cast 赤日轮
+
+生死劫的宏：
+/cast 心火叹
+/cast 生死劫
+/cast [tnobuff:戒火] 戒火斩
+/cast [moon>=sun] 银月斩
+/cast [sun>moon] 烈日斩
+/cast [sun>=moon] 赤日轮
+/cast 幽月轮
