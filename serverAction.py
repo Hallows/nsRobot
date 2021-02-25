@@ -361,14 +361,18 @@ def judge(message, qid, name, group, queue):
             assert(mental != -1) # 检查心法是否存在
         except:
             msg += '缺少心法名称'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+            return
 
         if msg == '':
             try:
-                with open('./macro/'+mental, 'r') as f:
+                with open('./macro/'+str(mental), 'r') as f:
                     lines = f.readlines()
                     msg = ' '.join(lines)
             except:
                 msg = '心法文件错误'
+                mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+                return
        
         mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了', messageType="TEXT",needAT=True,ATQQ=qid)
         mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
