@@ -214,8 +214,8 @@ def judge(message, qid, name, group, queue):
                 msg += '{}. ID：{} {} {} {} {} \n'.format(str(i+1), 
                         g['teamID'], g['leaderName'], g['dungeon'], 
                         g['startTime'], g['comment'])
-                msg += '---------------------------'
-
+                msg += '---------------------------\n'
+        print(msg)
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
     
     elif entrance in keyQuery:
@@ -359,15 +359,18 @@ def judge(message, qid, name, group, queue):
             mental = sql.getMental(commandPart[1].strip())
             assert(mental != -1) # 检查心法是否存在
         except:
-            msg += '缺少心法名称'
+            msg += '缺少心法名称或心法错误'
 
         if msg == '':
             try:
-                with open('./macro/'+mental, 'r') as f:
+                with open('./macro/'+str(mental), 'r') as f:
                     lines = f.readlines()
-                    msg = ' '.join(lines)
-            except:
-                msg = '心法文件错误'
+                    msg = ''.join(lines)
+                    print(msg)
+            except Exception as ex:
+                    print(str(ex))
+            #except:
+             #   msg = '心法文件错误'
        
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
