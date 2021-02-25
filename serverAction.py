@@ -220,7 +220,7 @@ def judge(message, qid, name, group, queue):
     
     elif entrance in keyQuery:
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
         except:
             teamNumber = None
 
@@ -248,7 +248,7 @@ def judge(message, qid, name, group, queue):
         msg = ''
 
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
         except:
             msg += '缺少团队ID '
 
@@ -296,7 +296,7 @@ def judge(message, qid, name, group, queue):
         msg = ''
 
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
         except:
             msg += '缺少团队ID'
 
@@ -330,7 +330,7 @@ def judge(message, qid, name, group, queue):
         msg = ''
 
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
             #msg = queue.removeTeam(qid, teamNumber)
         except:
             msg = '缺少团队ID'
