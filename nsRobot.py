@@ -17,9 +17,9 @@ except ImportError:
     print("can not find init file")
 
 
-miraiURL = 'http://0.0.0.0:8080'
-miraiKey = 'NSROBOTdevmode'
-miraiQQ = 2274927840
+miraiURL =init.miraiURL
+miraiKey = init.miraiKey
+miraiQQ = init.miraiQQ
 session='newsession'
 
 def initMirai():
@@ -62,7 +62,7 @@ def on_open(ws):
 
 if __name__ == "__main__":
     initMirai()
-    wsURL = 'ws://0.0.0.0:8080/message?sessionKey=' + mirai.session
+    wsURL = 'ws://'+init.miraiURL+'/message?sessionKey=' + mirai.session
     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     SQLConnect(db)
     queue = nsQueue()

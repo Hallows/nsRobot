@@ -11,3 +11,7 @@ FONT_PATH = "./font/"
 MACRO_PATH = "./macro/"
 
 SERVER = "天鹅坪"
+
+miraiQQ = 2274927840
+miraiKey = 'NSROBOTdevmode'
+miraiURL = 'http://0.0.0.0:8080'
