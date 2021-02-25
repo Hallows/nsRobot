@@ -9,13 +9,15 @@ import MiraiConnnect as mirai
 import generate_image as img
 from utils import parseDate, parseTime
 
-keyNewTeam = ['开团','新建团队']
-keyQuery = ['查看团队', '查询团队', '查看', '查询']
-keyEnroll = ['报名']
-keyDisenroll = ['取消报名', '退出']
-keyDeleteTeam = ['取消开团', '删除团队']
-keyHelp = ['帮助']
-keyAuthor = ['制作人员']
+keyNewTeam = ['开团', '新建团队', '创建团队']
+keyShowall = ['全团显示', '显示全团', '查看全团', '全团查看']
+keyQuery = ['查看团队', '查询团队', '查团']
+keyEnroll = ['报名', '报团', '报名团队']
+keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
+keyDeleteTeam = ['取消开团', '删除团队', '撤销团队', '撤销开团']
+keyMacro = ['宏']
+keyHelp = ['帮助', '指令', '查看指令']
+keyAuthor = ['作者', '制作团队', '制作名单']
 
 
 def containKeys(text, keys=['pt', 'yx', '普通', '英雄', '25']):
@@ -190,17 +192,32 @@ def judge(message, qid, name, group, queue):
 
         leader = sql.hasLeader(qid)
         if leader == -1:
-            msg = '团长错误！'
+            msg = '权限错误，请先申请成为团长'
         else:
             res = sql.createNewTeam(date, time, dungeon, comment, leader, useBlackList)
             if res == -1:
                 msg = '数据库错误！'
             else:
-                msg = '创建团队成功！' + date + time + dungeon + comment
+                msg = '开团成功，{}，团队ID为{}, 集合时间{} {}'.format(dungeon, res, date, time)
 
         #msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
+    elif entrance in keyShowall:
+        res = sql.getTeam()
+        if not res:
+            msg = '当前没有在开团队'
+        else:
+            msg = ''
+            for i in range(len(res)):
+                g = res[i]
+                msg += '{}. ID：{} {} {} {} {} {} \n'.format(str(i+1), 
+                        g['teamID'], g['leaderName'], g['dungeon'], 
+                        g['startTime'], g['comment'])
+                msg += '---------------------------'
+
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+    
     elif entrance in keyQuery:
         try:
             teamNumber = int(commandPart[1].strip())-1
@@ -214,20 +231,16 @@ def judge(message, qid, name, group, queue):
         #    msg = '查询错误'
 
         res = sql.getTeam()
-        if not res:
-            msg = '当前没有正在开的团'
+        if not res or teamNumber is None:
+            msg = '查看团队不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
         else:
-            if teamNumber is not None:
-                teamID = res[teamNumber]['teamID']
-                msg = img.GetImg(teamID)
-                mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
-            else:
-                msg = ''
-                for i in range(len(res)):
-                    g = res[i]
-                    msg += g['leaderName']+' '+g['dungeon']+' '+g['startTime']+' '+g['comment']+'\n'
+            image = img.GetImg(teamNumber)
+            if image == -1:
+                msg = '此团队目前没有人报名'
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            else:
+                mirai.sendGroupMessage(target=group, content=image, messageType="Image")
         #msg = queue.printQueue(teamNumber)
         #mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
@@ -235,20 +248,27 @@ def judge(message, qid, name, group, queue):
         msg = ''
 
         try:
-            vocation = sql.getMental(commandPart[1].strip())
-            assert(vocation != -1) # 检查心法是否存在
+            teamNumber = int(commandPart[1].strip())-1
         except:
-            msg += '缺少角色职业 '
+            msg += '缺少团队ID '
 
         try:
-            teamNumber = int(commandPart[2].strip())-1
+            vocation = commandPart[2].strip()
+            mental = sql.getMental(vocation)
+            assert(mental != -1) # 检查心法是否存在
         except:
-            msg += '缺少团队编号 '
+            msg += '缺少角色心法 '
 
         try:
             memberName = commandPart[3].strip()
         except:
             msg += '缺少角色名称 '
+
+        try:
+            syana = int(commandPart[4].strip())
+            assert(syana==1 or syana==0)
+        except:
+            syana = 0
 
         #try:
         #    member = nsMember(memberName, qid, vocation)
@@ -257,22 +277,20 @@ def judge(message, qid, name, group, queue):
         #    msg += '新建队员错误'
 
         if msg == '':
-            team = None
-            teams = sql.getTeam()
-            try:
-                team = teams[teamNumber]
-            except:
-                msg = '该团队不存在！'
-            if team is not None:
-                res = sql.addMember(team['teamID'], qid, memberName, vocation)
-                if res == -1:
-                    msg = memberName + '已经在团队中！'
-                elif res == 0:
-                    msg = memberName + '成功报名于 ' + team['leaderName']+' '+team['dungeon']+' '+team['startTime']+' '+team['comment'] 
-                else:
-                    msg = '数据库错误！'
+            res = sql.addMember(teamNumber, qid, memberName, mental, syana)
+            if res == 0:
+                team = sql.getInfo(teamNumber)
+                msg = '已成功报名 {} {}团长 {} {}-{}'.format(
+                        team['startTime'], team['leaderName'], 
+                        team['dungeon'], vocation, memberName)
+            elif res == -1:
+                msg = '已经在此团队中'
+            elif res == -3:
+                msg = '团队不存在或已过期'
+            else:
+                msg = '数据库错误！'
 
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyDisenroll:
         msg = ''
@@ -280,7 +298,7 @@ def judge(message, qid, name, group, queue):
         try:
             teamNumber = int(commandPart[1].strip())-1
         except:
-            msg += '缺少团队编号 '
+            msg += '缺少团队ID'
 
         #try:
         #    memberName = commandPart[2].strip()
@@ -294,47 +312,63 @@ def judge(message, qid, name, group, queue):
         #    msg += '新建队员错误'
 
         if msg == '':
-            team = None
-            teams = sql.getTeam()
-            try:
-                team = teams[teamNumber]
-            except:
-                msg = '该团队不存在！'
-            if team is not None:
-                res = sql.delMember(team['teamID'], qid)
-                if res == -1:
-                    msg = memberName + '不在团队中！'
-                elif res == 0:
-                    msg = memberName + '成功取消报名！'
-                else:
-                    msg = '数据库错误！'
+            res = sql.delMember(teamNumber, qid)
+            if res == 0:
+                team = sql.getInfo(teamNumber)
+                msg = '已成功取消报名 {} {}团长'.format(
+                        team['startTime'], team['leaderName'])
+            elif res == -1:
+                msg = '不在此团队中'
+            elif res == -3:
+                msg = '团队不存在或已过期'
+            else:
+                msg = '数据库错误！'
 
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyDeleteTeam:
         msg = ''
+
         try:
             teamNumber = int(commandPart[1].strip())-1
             #msg = queue.removeTeam(qid, teamNumber)
         except:
-            msg = '缺少团队编号'
+            msg = '缺少团队ID'
 
         if msg == '':
-            team = None
-            teams = sql.getTeam()
-            try:
-                team = teams[teamNumber]
-            except:
-                msg = '该团队不存在！'
-            if team is not None:
-                res = sql.delTeam(team['teamID'], qid)
-                if res == -2:
-                    msg = '删除团队失败，没有该权限！'
-                elif res == 0:
-                    msg = '删除团队成功！'
+            leader = sql.hasLeader(qid)
+            if leader == -1:
+                msg = '权限错误，请先申请成为团长'
+            else:
+                res = sql.delTeam(teamNumber, leader)
+                if res == 0:
+                    msg = '团队{}已经取消'.format(teamNumber)
+                elif res == -1:
+                    msg = '此团队不存在'
+                elif res == -2:
+                    msg = '取消开团失败，没有该权限'
                 else:
                     msg = '数据库错误！'
 
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+
+    elif entrance in keyMacro:
+        msg = ''
+
+        try:
+            mental = sql.getMental(commandPart[1].strip())
+            assert(mental != -1) # 检查心法是否存在
+        except:
+            msg += '缺少心法名称'
+
+        if msg == '':
+            try:
+                with open('./macro/'+mental, 'r') as f:
+                    lines = f.readlines()
+                    msg = ' '.join(lines)
+            else:
+                msg = '心法文件错误'
+       
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyHelp:
