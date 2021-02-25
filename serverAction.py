@@ -16,7 +16,7 @@ keyEnroll = ['报名', '报团', '报名团队']
 keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
 keyDeleteTeam = ['取消开团', '删除团队', '撤销团队', '撤销开团']
 keyMacro = ['宏']
-keyHelp = ['帮助', '指令', '查看指令']
+keyHelp = ['帮助', '指令', '查看指令','指令清单']
 keyAuthor = ['作者', '制作团队', '制作名单']
 
 
@@ -378,10 +378,10 @@ def judge(message, qid, name, group, queue):
         mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
 
     elif entrance in keyHelp:
-        msg = '制作中WIP'
+        msg = '在线用户手册： \nhttps://github.com/Hallows/nsRobot/blob/main/doc/userGuide.md'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyAuthor:
-        msg = '特别致谢：Magicat'
+        msg = '致谢与授权说明： \nhttps://github.com/Hallows/nsRobot/blob/main/README.md'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
