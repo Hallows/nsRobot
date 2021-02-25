@@ -268,6 +268,8 @@ def updateDB():
 #团长ID-leaderID-str
 #开团日期-date-格式：2021-02-24
 #开团时间-time-格式：11:00
+#例如：
+#{'teamID': 1002, 'leaderName': '渡空离', 'dungeon': '25YX达摩洞', 'startTime': '01-31 20:00', 'comment': '25YX', 'leaderID': 1, 'date': '2021-01-31', 'time': '20:00'}
 def getInfo(teamID):
     global db
     out={}
@@ -276,18 +278,19 @@ def getInfo(teamID):
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
-        teamID = row[0]
-        leaderID = row[1]
-        dungeon = row[2]
-        date = row[3]
-        time = row[4]
-        comment=row[7]
+        teamID = result[0]
+        leaderID = result[1]
+        dungeon = result[2]
+        date = result[3]
+        time = result[4]
+        comment=result[7]
         startTime = "%s %s" % (date, time)
         startTime = startTime[5:]
         command = "SELECT * FROM ns_leader WHERE id={}".format(leaderID)
         cursor.execute(command)
         result = cursor.fetchone()
         leaderName = result[2]
-        out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment':comment,'leaderID':leaderID,'startDate':date,'startTime':time}
+        out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment': comment, 'leaderID': leaderID, 'date': date, 'time': time}
+        return out
     else:
         return out

@@ -18,5 +18,5 @@ SQL.SQLConnect(temp)
 #result = SQL.addMember(1040, 602857593, '渡空离', mentalID, 1)
 #result=SQL.delMember(1040,602857593)
 #result=SQL.delTeam(1040,leaderID)
-print(SQL.newLeader(600857593, '渡空离', '啥时候都行'))
-
+#print(SQL.newLeader(600857593, '渡空离', '啥时候都行'))
+print(SQL.getInfo(1002))
