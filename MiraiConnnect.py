@@ -117,7 +117,35 @@ def sendGroupMessage(target, content: str, messageType="TEXT", needAT=False, ATQ
     res = requests.post(url=url, json=requestData)
     jsonData = res.json()
     if jsonData['code'] != 0:
-        print("get error when send message")
+        print("get error {} when send message".format(jsonData['code']))
+
+#对指定群聊中的指定人发送临时消息
+#输入-target：用于发起临时对话的群聊的群号
+#输入-QQ：发送临时对话对象的QQ号
+#输入-content：若需要发送文字则为文字内容，若需要发送图片为图片的本地位置
+#输入-messageTye：默认为TEXT即文字，也可接受Image即图片
+def sendTempMessage(target, QQ, content: str, messageType="TEXT"):
+    global miraiURL
+    global session
+    chain = []
+    if messageType == "TEXT":
+        temp = {"type": "Plain", "text": content}
+        chain.append(temp)
+    elif messageType == "Image":
+        temp = {"type": "Image", "path": content}
+        chain.append(temp)
+    requestData = {
+    "sessionKey": session,
+    "qq":QQ,
+    "group": target,
+    "messageChain": chain
+    }
+    url = miraiURL + '/sendTempMessage'
+    res = requests.post(url=url, json=requestData)
+    jsonData = res.json()
+    if jsonData['code'] != 0:
+        print("get error code {} when send Temp message".format(jsonData['code']))
+
 
 #------IMPORTANT-------
 #此函数用于抛出错误提示，鉴于错误意料外的错误列表可能会很长，此函数恒放置于此文件最后！
