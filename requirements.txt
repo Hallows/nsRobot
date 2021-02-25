@@ -1,0 +1,5 @@
+PyMySQL==1.0.2
+requests==2.18.4
+Pillow==8.1.0
+pyunit_time==2021.2.2
+websocket_client==0.57.0
