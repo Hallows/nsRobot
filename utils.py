@@ -26,7 +26,7 @@ def parseDate(date):
 
 def parseTime(time):
     try:
-        res = Time('2021-01-01 00:00:00').parse(time)
+        res = Time('2021-01-01 00:00:00').parse(time+'分')
         res = res[0]['keyDate'][11:16] # yyyy-mm-dd HH:MM:SS
     except Exception as ex:
         print(str(ex))
