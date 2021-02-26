@@ -87,6 +87,25 @@ def startWebSocket():
     requests.post(url=url, json=requestData)
     print('WebSocketStarted!')
 
+def acceptNewFriend(eventID, fromId, groupId, message,name):
+    global miraiURL
+    global session
+    requestData = {
+        'sessionKey': session,
+        'eventId': int(eventID),
+        'fromId': int(fromId),
+        'groupId': int(groupId),
+        'operate': 0,
+        "message": message
+        }
+    url = miraiURL + '/resp/newFriendRequestEvent'
+    res = requests.post(url=url, json=requestData)
+    jsonData = res.json()
+    if jsonData['code'] != 0:
+        print("get error {} when send message".format(jsonData['code']))
+    else:
+        print("got new friend request from {} with QQ:{}".format(fromId,name))
+
 #对指定群聊发送信息
 #输入-target：目标群聊的群号
 #输入-content：若需要发送文字则为文字内容，若需要发送图片为图片的本地位置

@@ -1,4 +1,5 @@
 import re
+import datetime
 from pyunit_time import Time
 
 
@@ -30,5 +31,17 @@ def parseTime(time):
     except Exception as ex:
         print(str(ex))
         res = -1 #'时间错误！'
+
+    return res
+
+def parseWeekday(string):
+    week_dict = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+
+    try:
+        date = parseDate(string.split()[0])
+        yy, mm, dd = date.split('-')
+        res = week_dict[datetime.date(int(yy), int(mm), int(dd)).weekday()]
+    except:
+        res = ''
 
     return res
