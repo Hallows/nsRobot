@@ -43,8 +43,13 @@ def DrawRectangal(db: pymysql.connections.Connection, img: Image.Image, x: int, 
         width=1
     )
 
+    if len(info[2]) > 6:
+        name = info[2][0:6]
+    else:
+        name = info[2]
+
     drawer.text((startX + (0.3+x)*boxLength,
-                 startY + (boxHeight / 2) + (y + 0.25) * boxHeight), info[2], font=font, fill=0x000000)
+                 startY + (boxHeight / 2) + (y + 0.25) * boxHeight), name, font=font, fill=0x000000)
 
     r = boxLength / 10
 
@@ -109,6 +114,13 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
     tank = []
 
     cursor = db.cursor()
+
+    if memberCount == 0:
+        cursor.execute("SELECT * FROM ns_team WHERE teamID = " +
+                       teamdata[0].__str__())
+        lt = cursor.fetchall()
+        if len(lt) == 0:
+            return -1
 
     for member in teamdata[1]:
         cursor.execute(

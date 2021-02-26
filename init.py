@@ -1,4 +1,4 @@
-dbHost = '139.198.178.48'
+dbHost = 'localhost'
 dbPort = 3306
 dbUser = 'nsBot'
 dbPassword = 'nanshanrobot'
@@ -6,7 +6,7 @@ dbName = 'ns_db'
 dbCharset = 'utf8'
 
 MENTAL_ICON_PATH = "./mental_icon/"
-IMAGE_PATH = "/home/ubuntu/mirai/data/net.mamoe.mirai-api-http/images/"
+IMAGE_PATH = "./temp/img/"
 FONT_PATH = "./font/"
 MACRO_PATH = "./macro/"
 

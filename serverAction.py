@@ -7,10 +7,10 @@
 import sqlConnect as sql
 import MiraiConnnect as mirai
 import generate_image as img
-from utils import parseDate, parseTime
+from utils import parseDate, parseTime, parseWeekday
 
 keyNewTeam = ['开团', '新建团队', '创建团队']
-keyShowall = ['全团显示', '显示全团', '查看全团', '全团查看']
+keyShowall = ['全团显示', '显示全团', '查看全团', '全团查看', '团队列表']
 keyQuery = ['查看团队', '查询团队', '查团']
 keyEnroll = ['报名', '报团', '报名团队']
 keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
@@ -159,14 +159,17 @@ class nsQueue():
         return msg
 
 
-def judge(message, qid, name, group, queue):
-    if message[:2] != 'ns': #如果开头不是ns那么一切免谈，无事发生
+def judge(message, qid, name, group):
+    if message[:2].lower() != 'ns': #如果开头不是ns那么一切免谈，无事发生
         return
 
     ############## Main ###################
     command = message[2:].strip() #把ns去掉后面开始分割这个指令
     commandPart = command.split( ) #按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
-    entrance = commandPart[0].strip()
+    try:
+        entrance = commandPart[0].strip()
+    except:
+        entrance = ''
 
     if entrance in keyNewTeam:
         try: #尝试解析参数，如果出错说明输入参数有误
@@ -196,9 +199,9 @@ def judge(message, qid, name, group, queue):
         else:
             res = sql.createNewTeam(date, time, dungeon, comment, leader, useBlackList)
             if res == -1:
-                msg = '数据库错误！'
+                msg = '数据库错误！请联系管理员'
             else:
-                msg = '开团成功，{}，团队ID为{}, 集合时间{} {}'.format(dungeon, res, date, time)
+                msg = '开团成功，{}，团队ID为{}, 集合时间{} {} {}'.format(dungeon, res, date, parseWeekday(date), time)
 
         #msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
@@ -207,18 +210,18 @@ def judge(message, qid, name, group, queue):
         res = sql.getTeam()
         if not res:
             msg = '当前没有在开团队'
-            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=False)
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
             return
         else:
             msg = ''
             for i in range(len(res)):
                 g = res[i]
-                msg += '{}. ID：{} {} {} {} {} \n'.format(str(i+1), 
+                msg += '{}. ID：{} {} {} {} {} {} \n'.format(str(i+1), 
                         g['teamID'], g['leaderName'], g['dungeon'], 
-                        g['startTime'], g['comment'])
-                msg += '--------------------------- \n'
+                        g['startTime'], parseWeekday(g['startTime']) , g['comment'])
+                msg += '------------------- \n'
 
-        mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~", messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~如果没收到请加机器人好友", messageType="TEXT",needAT=True,ATQQ=qid)
         mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
     
     elif entrance in keyQuery:
@@ -235,7 +238,7 @@ def judge(message, qid, name, group, queue):
 
         res = sql.getTeam()
         if not res or teamNumber is None:
-            msg = '此团队ID不存在'
+            msg = '输入的团队ID不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
         else:
             image = img.GetImg(teamNumber)
@@ -291,8 +294,10 @@ def judge(message, qid, name, group, queue):
             elif res == -3:
                 msg = '团队不存在或已过期'
             else:
-                msg = '数据库错误！'
-
+                msg = '数据库错误！请联系管理员'
+        else:
+            msg += '\n报团格式：ns报团 团队ID 心法 角色名\n双修心法请在报团命令最后额外加空格加1'
+            
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyDisenroll:
@@ -325,7 +330,7 @@ def judge(message, qid, name, group, queue):
             elif res == -3:
                 msg = '团队不存在或已过期'
             else:
-                msg = '数据库错误！'
+                msg = '数据库错误！请联系管理员'
 
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
@@ -351,7 +356,7 @@ def judge(message, qid, name, group, queue):
                 elif res == -2:
                     msg = '取消开团失败，没有该权限'
                 else:
-                    msg = '数据库错误！'
+                    msg = '数据库错误！请联系管理员'
 
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
@@ -370,13 +375,13 @@ def judge(message, qid, name, group, queue):
             try:
                 with open('./macro/'+str(mental), 'r') as f:
                     lines = f.readlines()
-                    msg = ' '.join(lines)
+                    msg = ''.join(lines)
             except:
-                msg = '心法文件错误'
+                msg = '心法文件错误！请联系管理员'
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
                 return
        
-        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了', messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了，如果没收到请加机器人好友', messageType="TEXT",needAT=True,ATQQ=qid)
         mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
 
     elif entrance in keyHelp:
@@ -386,4 +391,8 @@ def judge(message, qid, name, group, queue):
     elif entrance in keyAuthor:
         msg = '致谢与授权说明： \nhttps://github.com/Hallows/nsRobot/blob/main/README.md'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
+    else:
+        msg = '未知指令，请通过 ns帮助 进行查看'
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
