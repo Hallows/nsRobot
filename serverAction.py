@@ -218,7 +218,7 @@ def judge(message, qid, name, group):
                         g['startTime'], parseWeekday(g['startTime']) , g['comment'])
                 msg += '------------------- \n'
 
-        mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~", messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~如果没收到请加机器人好友", messageType="TEXT",needAT=True,ATQQ=qid)
         mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
     
     elif entrance in keyQuery:
@@ -378,7 +378,7 @@ def judge(message, qid, name, group):
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
                 return
        
-        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了', messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了，如果没收到请加机器人好友', messageType="TEXT",needAT=True,ATQQ=qid)
         mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
 
     elif entrance in keyHelp:

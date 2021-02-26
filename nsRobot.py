@@ -37,15 +37,24 @@ def initMirai():
 
 def on_message(ws, message):
     incomeJson = json.loads(message)
-    if incomeJson['messageChain'][1]['type'] == 'Plain':
-        incomeQQ = incomeJson['sender']['id']
-        incomeMemberName = incomeJson['sender']['memberName']
-        incomeGroupChatID=incomeJson['sender']['group']['id']
-        incomeMessage = incomeJson['messageChain'][1]['text']
-        temp='Get income message from GroupChat {} named {}(QQ:{}) with text: {}'.format(incomeGroupChatID,incomeMemberName,incomeQQ,incomeMessage)
-        print(temp)
-        action.judge(message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
-        #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
+    if incomeJson['type'] == 'GroupMessage':
+        if incomeJson['messageChain'][1]['type'] == 'Plain':
+            incomeQQ = incomeJson['sender']['id']
+            incomeMemberName = incomeJson['sender']['memberName']
+            incomeGroupChatID=incomeJson['sender']['group']['id']
+            incomeMessage = incomeJson['messageChain'][1]['text']
+            temp='Get income message from GroupChat {} named {}(QQ:{}) with text: {}'.format(incomeGroupChatID,incomeMemberName,incomeQQ,incomeMessage)
+            print(temp)
+            action.judge(message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
+            #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
+    if incomeJson['type'] == 'NewFriendRequestEvent':
+        eventID = incomeJson['eventId']
+        fromId = incomeJson['fromId']
+        groupId = incomeJson['groupId']
+        nickName = incomeJson['nick']
+        incomeMessage = incomeJson['message']
+        mirai.acceptNewFriend(eventID=eventID,fromId=fromId,groupId=groupId,message="你好，朋友",name=nickName)
+        
 
 def on_error(ws, error):
     print(error)
@@ -61,7 +70,7 @@ def on_open(ws):
 
 if __name__ == "__main__":
     initMirai()
-    wsURL = 'ws://'+init.miraiURL[7:]+'/message?sessionKey=' + mirai.session
+    wsURL = 'ws://'+init.miraiURL[7:]+'/all?sessionKey=' + mirai.session
     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     SQLConnect(db)
     websocket.enableTrace(True)
