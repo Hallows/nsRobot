@@ -115,6 +115,13 @@ def GenerateImage(db: pymysql.connections.Connection, teamdata: tuple):
 
     cursor = db.cursor()
 
+    if memberCount == 0:
+        cursor.execute("SELECT * FROM ns_team WHERE teamID = " +
+                       teamdata[0].__str__())
+        lt = cursor.fetchall()
+        if len(lt) == 0:
+            return -1
+
     for member in teamdata[1]:
         cursor.execute(
             "SELECT * FROM ns_mental WHERE mentalID = " + member[3].__str__())
