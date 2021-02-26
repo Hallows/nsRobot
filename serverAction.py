@@ -166,7 +166,10 @@ def judge(message, qid, name, group):
     ############## Main ###################
     command = message[2:].strip() #把ns去掉后面开始分割这个指令
     commandPart = command.split( ) #按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
-    entrance = commandPart[0].strip()
+    try:
+        entrance = commandPart[0].strip()
+    except:
+        entrance = ''
 
     if entrance in keyNewTeam:
         try: #尝试解析参数，如果出错说明输入参数有误
@@ -198,7 +201,7 @@ def judge(message, qid, name, group):
             if res == -1:
                 msg = '数据库错误！请联系管理员'
             else:
-                msg = '开团成功，{}，团队ID为{}, 集合时间{} {}'.format(dungeon, res, date, time)
+                msg = '开团成功，{}，团队ID为{}, 集合时间{} {} {}'.format(dungeon, res, date, parseWeekday(date), time)
 
         #msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
