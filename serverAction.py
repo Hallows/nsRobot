@@ -196,7 +196,7 @@ def judge(message, qid, name, group):
         else:
             res = sql.createNewTeam(date, time, dungeon, comment, leader, useBlackList)
             if res == -1:
-                msg = '数据库错误！'
+                msg = '数据库错误！请联系管理员'
             else:
                 msg = '开团成功，{}，团队ID为{}, 集合时间{} {}'.format(dungeon, res, date, time)
 
@@ -291,7 +291,7 @@ def judge(message, qid, name, group):
             elif res == -3:
                 msg = '团队不存在或已过期'
             else:
-                msg = '数据库错误！'
+                msg = '数据库错误！请联系管理员'
         else:
             msg += '\n报团格式：ns报团 团队ID 心法 角色名\n双修心法请在报团命令最后额外加空格加1'
             
@@ -327,7 +327,7 @@ def judge(message, qid, name, group):
             elif res == -3:
                 msg = '团队不存在或已过期'
             else:
-                msg = '数据库错误！'
+                msg = '数据库错误！请联系管理员'
 
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
@@ -353,7 +353,7 @@ def judge(message, qid, name, group):
                 elif res == -2:
                     msg = '取消开团失败，没有该权限'
                 else:
-                    msg = '数据库错误！'
+                    msg = '数据库错误！请联系管理员'
 
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
@@ -374,7 +374,7 @@ def judge(message, qid, name, group):
                     lines = f.readlines()
                     msg = ''.join(lines)
             except:
-                msg = '心法文件错误'
+                msg = '心法文件错误！请联系管理员'
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
                 return
        
@@ -391,5 +391,5 @@ def judge(message, qid, name, group):
 
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
