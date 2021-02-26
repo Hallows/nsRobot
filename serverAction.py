@@ -292,7 +292,9 @@ def judge(message, qid, name, group, queue):
                 msg = '团队不存在或已过期'
             else:
                 msg = '数据库错误！'
-
+        else:
+            msg += '\n报团格式：ns报团 团队ID 心法 角色名\n双修心法请在报团命令最后额外加空格加1'
+            
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyDisenroll:
