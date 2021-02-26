@@ -43,8 +43,13 @@ def DrawRectangal(db: pymysql.connections.Connection, img: Image.Image, x: int, 
         width=1
     )
 
+    if len(info[2]) > 6:
+        name = info[2][0:6]
+    else:
+        name = info[2]
+
     drawer.text((startX + (0.3+x)*boxLength,
-                 startY + (boxHeight / 2) + (y + 0.25) * boxHeight), info[2], font=font, fill=0x000000)
+                 startY + (boxHeight / 2) + (y + 0.25) * boxHeight), name, font=font, fill=0x000000)
 
     r = boxLength / 10
 
