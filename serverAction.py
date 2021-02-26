@@ -7,7 +7,7 @@
 import sqlConnect as sql
 import MiraiConnnect as mirai
 import generate_image as img
-from utils import parseDate, parseTime
+from utils import parseDate, parseTime, parseWeekday
 
 keyNewTeam = ['开团', '新建团队', '创建团队']
 keyShowall = ['全团显示', '显示全团', '查看全团', '全团查看', '团队列表']
@@ -213,10 +213,10 @@ def judge(message, qid, name, group):
             msg = ''
             for i in range(len(res)):
                 g = res[i]
-                msg += '{}. ID：{} {} {} {} {} \n'.format(str(i+1), 
+                msg += '{}. ID：{} {} {} {} {} {} \n'.format(str(i+1), 
                         g['teamID'], g['leaderName'], g['dungeon'], 
-                        g['startTime'], g['comment'])
-                msg += '--------------------------- \n'
+                        g['startTime'], parseWeekday(g['startTime']) , g['comment'])
+                msg += '------------------- \n'
 
         mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~", messageType="TEXT",needAT=True,ATQQ=qid)
         mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
