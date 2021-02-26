@@ -16,7 +16,7 @@ keyEnroll = ['报名', '报团', '报名团队']
 keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
 keyDeleteTeam = ['取消开团', '删除团队', '撤销团队', '撤销开团']
 keyMacro = ['宏']
-keyHelp = ['帮助', '指令', '查看指令']
+keyHelp = ['帮助', '指令', '查看指令','指令清单']
 keyAuthor = ['作者', '制作团队', '制作名单']
 
 
@@ -214,13 +214,14 @@ def judge(message, qid, name, group, queue):
                 msg += '{}. ID：{} {} {} {} {} \n'.format(str(i+1), 
                         g['teamID'], g['leaderName'], g['dungeon'], 
                         g['startTime'], g['comment'])
-                msg += '---------------------------\n'
-        print(msg)
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+                msg += '--------------------------- \n'
+
+        mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~", messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
     
     elif entrance in keyQuery:
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
         except:
             teamNumber = None
 
@@ -248,7 +249,7 @@ def judge(message, qid, name, group, queue):
         msg = ''
 
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
         except:
             msg += '缺少团队ID '
 
@@ -296,7 +297,7 @@ def judge(message, qid, name, group, queue):
         msg = ''
 
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
         except:
             msg += '缺少团队ID'
 
@@ -330,7 +331,7 @@ def judge(message, qid, name, group, queue):
         msg = ''
 
         try:
-            teamNumber = int(commandPart[1].strip())-1
+            teamNumber = int(commandPart[1].strip())
             #msg = queue.removeTeam(qid, teamNumber)
         except:
             msg = '缺少团队ID'
@@ -359,26 +360,28 @@ def judge(message, qid, name, group, queue):
             mental = sql.getMental(commandPart[1].strip())
             assert(mental != -1) # 检查心法是否存在
         except:
-            msg += '缺少心法名称或心法错误'
+            msg += '缺少心法名称'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+            return
 
         if msg == '':
             try:
                 with open('./macro/'+str(mental), 'r') as f:
                     lines = f.readlines()
-                    msg = ''.join(lines)
-                    print(msg)
-            except Exception as ex:
-                    print(str(ex))
-            #except:
-             #   msg = '心法文件错误'
+                    msg = ' '.join(lines)
+            except:
+                msg = '心法文件错误'
+                mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+                return
        
-        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了', messageType="TEXT",needAT=True,ATQQ=qid)
+        mirai.sendTempMessage(target=group,QQ=qid,content=msg,messageType="TEXT")
 
     elif entrance in keyHelp:
-        msg = '制作中WIP'
+        msg = '在线用户手册： \nhttps://github.com/Hallows/nsRobot/blob/main/doc/userGuide.md'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyAuthor:
-        msg = '特别致谢：Magicat'
+        msg = '致谢与授权说明： \nhttps://github.com/Hallows/nsRobot/blob/main/README.md'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
