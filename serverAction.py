@@ -207,6 +207,8 @@ def judge(message, qid, name, group, queue):
         res = sql.getTeam()
         if not res:
             msg = '当前没有在开团队'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            return
         else:
             msg = ''
             for i in range(len(res)):
@@ -233,7 +235,7 @@ def judge(message, qid, name, group, queue):
 
         res = sql.getTeam()
         if not res or teamNumber is None:
-            msg = '查看团队不存在'
+            msg = '输入的团队ID不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
         else:
             image = img.GetImg(teamNumber)
