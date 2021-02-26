@@ -10,7 +10,7 @@ import generate_image as img
 from utils import parseDate, parseTime
 
 keyNewTeam = ['开团', '新建团队', '创建团队']
-keyShowall = ['全团显示', '显示全团', '查看全团', '全团查看']
+keyShowall = ['全团显示', '显示全团', '查看全团', '全团查看', '团队列表']
 keyQuery = ['查看团队', '查询团队', '查团']
 keyEnroll = ['报名', '报团', '报名团队']
 keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
@@ -159,8 +159,8 @@ class nsQueue():
         return msg
 
 
-def judge(message, qid, name, group, queue):
-    if message[:2] != 'ns': #如果开头不是ns那么一切免谈，无事发生
+def judge(message, qid, name, group):
+    if message[:2].lower() != 'ns': #如果开头不是ns那么一切免谈，无事发生
         return
 
     ############## Main ###################
@@ -372,7 +372,7 @@ def judge(message, qid, name, group, queue):
             try:
                 with open('./macro/'+str(mental), 'r') as f:
                     lines = f.readlines()
-                    msg = ' '.join(lines)
+                    msg = ''.join(lines)
             except:
                 msg = '心法文件错误'
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
@@ -387,5 +387,9 @@ def judge(message, qid, name, group, queue):
 
     elif entrance in keyAuthor:
         msg = '致谢与授权说明： \nhttps://github.com/Hallows/nsRobot/blob/main/README.md'
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
+    else:
+        msg = '未知指令，请通过 ns帮助 进行查看'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 

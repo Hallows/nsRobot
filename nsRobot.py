@@ -5,7 +5,6 @@ import time
 import requests
 import websocket
 import pymysql
-from serverAction import nsQueue
 from sqlConnect import SQLConnect 
 try:
     import thread
@@ -45,7 +44,7 @@ def on_message(ws, message):
         incomeMessage = incomeJson['messageChain'][1]['text']
         temp='Get income message from GroupChat {} named {}(QQ:{}) with text: {}'.format(incomeGroupChatID,incomeMemberName,incomeQQ,incomeMessage)
         print(temp)
-        action.judge(message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID, queue=queue)
+        action.judge(message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
         #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
 
 def on_error(ws, error):
@@ -65,7 +64,6 @@ if __name__ == "__main__":
     wsURL = 'ws://'+init.miraiURL[7:]+'/message?sessionKey=' + mirai.session
     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
     SQLConnect(db)
-    queue = nsQueue()
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp(url=wsURL,
                             on_message = on_message,
