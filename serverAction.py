@@ -227,6 +227,7 @@ def judge(message, qid, name, group):
     elif entrance in keyQuery:
         try:
             teamNumber = int(commandPart[1].strip())
+            res = sql.getInfo(teamNumber)
         except:
             teamNumber = None
 
@@ -236,7 +237,6 @@ def judge(message, qid, name, group):
         #    isValid = False # 非图片url通道
         #    msg = '查询错误'
 
-        res = sql.getTeam()
         if not res or teamNumber is None:
             msg = '输入的团队ID不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")

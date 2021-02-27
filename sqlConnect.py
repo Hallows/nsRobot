@@ -24,8 +24,10 @@ def hasLeader(leaderQQ):
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
+        cursor.close()
         return result[0]
     else:
+        cursor.close()
         return - 1  #权限错误
 
 #创建一个团队
@@ -51,11 +53,14 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
     except Exception as ex:
         print(str(ex))
         db.rollback()
+        cursor.close()
         return -1 #开团失败
     if cursor.rowcount != 0:
         result = cursor.fetchone()
+        cursor.close()
         return result[0]
     else:
+        cursor.close()
         return - 1  #开团失败
 
 #获取心法对应的心法ID
@@ -71,8 +76,10 @@ def getMental(mentalName):
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
+        cursor.close()
         return result[0]
     else:
+        cursor.close()
         return - 1  #无法获取心法
 
 #向指定团队添加报名记录
@@ -93,6 +100,7 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
     command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
     cursor.execute(command)
     if cursor.rowcount == 0:
+        cursor.close()
         return -3
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
@@ -103,9 +111,12 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
             db.commit()
         except Exception as ex:
             print(str(ex))
+            cursor.close()
             return - 2  #写入错误
+        cursor.close()
         return 0
     else:
+        cursor.close()
         return - 1  #传入QQ在此团队已经有报名记录
 
 #从指定团队中删除传入QQ的所有报名记录
@@ -123,6 +134,7 @@ def delMember(teamID, QQ):
     command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
     cursor.execute(command)
     if cursor.rowcount == 0:
+        cursor.close()
         return -3 #团队不存在或已过期
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
@@ -133,9 +145,12 @@ def delMember(teamID, QQ):
             db.commit()
         except Exception as ex:
             print(str(ex))
+            cursor.close()
             return - 2  #数据库写入错误
+        cursor.close()
         return 0
     else:
+        cursor.close()
         return - 1  #传入QQ没有在团队有报名记录
 
 #撤销开团
@@ -161,11 +176,15 @@ def delTeam(teamID, leaderID:int):
                 db.commit()
             except Exception as ex:
                 print(str(ex))
+                cursor.close()
                 return - 3  #数据库写入错误
+            cursor.close()
             return 0
         else:
+            cursor.close()
             return - 2  #传入的团长ID不是开团者
     else:
+        cursor.close()
         return - 1  #查无此团
 #添加一条团长申请
 #-------输入---------
@@ -182,16 +201,19 @@ def newLeader(QQ, nickName, activeTime):
     command = "SELECT * FROM ns_leader WHERE QQNumber={} AND effective=1".format(QQ)
     cursor.execute(command)
     if cursor.rowcount != 0:
+        cursor.close()
         return - 1
     else:
         command = "SELECT * FROM ns_leader WHERE QQNumber={}".format(QQ)
         cursor.execute(command)
         if cursor.rowcount != 0:
+            cursor.close()
             return - 2
         else:
             command = "INSERT INTO ns_leader(QQNumber,nickName,activeTime,effective) VALUES('{}','{}','{}',1)".format(QQ, nickName, activeTime)
             cursor.execute(command)
             db.commit()
+            cursor.close()
             return 0
 
 #获取所有在开团队
@@ -234,6 +256,7 @@ def getTeam():
             leaderName=result[2]
             temp = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment':comment}
             out.append(temp)
+    cursor.close()
     return out
         
 #扫描数据库并更新团队状态，清理所有过期团队
@@ -256,7 +279,10 @@ def updateDB():
                 closeTeam = "UPDATE ns_team SET effective=1 WHERE teamID={}".format(teamID)
                 cursor.execute(closeTeam)
                 db.commit()
+                cursor.close()
+                return
     else:
+        cursor.close()
         return
 
 #获取指定团队的状态
@@ -296,6 +322,8 @@ def getInfo(teamID):
         result = cursor.fetchone()
         leaderName = result[2]
         out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment': comment, 'leaderID': leaderID, 'date': date, 'time': time}
+        cursor.close()
         return out
     else:
+        cursor.close()
         return out
