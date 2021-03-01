@@ -24,145 +24,6 @@ keyHelp = ['帮助', '指令', '查看指令','指令清单']
 keyAuthor = ['作者', '制作团队', '制作名单']
 
 
-def containKeys(text, keys=['pt', 'yx', '普通', '英雄', '25']):
-    for key in keys:
-        if key in text:
-            return True
-
-    return False
-
-
-class nsMember():
-    def __init__(self, name, qid, fst_vocation, snd_vocation=None):
-        self.name = name
-        self.qid = qid
-        self.fst_vocation = fst_vocation
-        self.snd_vocation = snd_vocation
-
-    def printMember(self):
-        return self.name + '(' + self.fst_vocation + ')'
-
-
-class nsTeam():
-    def __init__(self, teamID, leader, date, time, dungeon, comment=''):
-        self.teamID = teamID
-        self.leader = leader
-        self.date = date
-        self.time = time
-        self.dungeon = dungeon
-        self.comment = comment
-
-        self.members = []
-        self.volume = 25 if containKeys(self.dungeon) else 10
-
-    def printTeam(self, showMembers=False):
-        msg = str(len(self.members)) + '/' + str(self.volume) + '人 ' + self.date + self.time + self.dungeon + self.comment
-        if showMembers: # 是否显示队员
-            msg = img.GetImg(self.teamID)
-            #msg += '\n'
-            #for i in range(len(self.members)):
-            #    msg += ' ' + self.members[i].printMember()
-
-        return msg
-
-    def addMember(self, member):
-        if len(self.members) < self.volume:
-            valid = True
-            for i in range(len(self.members)):
-                if valid and self.members[i].name == member.name:
-                    msg = member.name + '已经在该团队中！'
-                    valid = False
-            if valid:
-                if sql.addMember(self.teamID, member.qid, member.name, member.fst_vocation) < 0:
-                    msg = '数据库错误！'
-                else:
-                    self.members.append(member)
-                    msg = member.name + '成功报名于' + self.date + self.time + self.dungeon + self.comment
-        else:
-            msg = '该团队已满！'
-
-        return msg
-
-    def removeMember(self, member):
-        for i in range(len(self.members)):
-            if self.members[i].qid == member.qid:
-                sql.delMember(self.teamID, member.qid)
-                self.members.remove(self.members[i])
-        msg = member.name + '成功取消报名！'
-
-        return msg
-
-
-class nsQueue():
-    def __init__(self):
-        self.teams = []
-
-    def printQueue(self, number=None):
-        if not self.teams:
-            msg = '当前没有团队！'
-        else:
-            if number is not None: # 查询指定团队
-                try:
-                    msg = self.teams[number].printTeam(showMembers=True)
-                except Exception as ex:
-                    print(str(ex))
-                    msg = '该团队不存在！'
-            else: # 查询所有团队
-                msg = ''
-                for i in range(len(self.teams)):
-                    msg += str(i+1) + '. ' + self.teams[i].printTeam() + '\n'
-
-        return msg
-
-    def createNewTeam(self, qid, date, time, dungeon, comment='', useBlackList=0):
-        leader = sql.hasLeader(qid)
-        if leader == -1:
-            msg = '团长错误！'
-        else:
-            teamID = sql.createNewTeam(date, time, dungeon, comment, leader, useBlackList)
-            if teamID == -1:
-                msg = '数据库错误！'
-            else:
-                team = nsTeam(teamID, qid, date, time, dungeon, comment)
-                self.teams.append(team)
-                msg = '创建团队成功! ' + team.printTeam()
-
-        return msg
-
-    def removeTeam(self, qid, number):
-        if number < 0 or number > len(self.teams)-1:
-            msg = '该团队不存在！'
-        else:
-            if qid != self.teams[number].leader:
-                msg = '删除团队失败，没有该权限！'
-            else:
-                if sql.delTeam(self.teams[number].teamID, qid) == 0:
-                    self.teams.remove(self.teams[number])
-                    msg = '删除团队成功！'
-                else:
-                    msg = '数据库错误！'
-
-        return msg
-
-    def addMember(self, teamNumber, member):
-        try:
-            msg = self.teams[teamNumber].addMember(member)
-        except Exception as ex:
-            print(str(ex))
-            msg = '该团队不存在！'
-
-        return msg
-
-    def removeMember(self, teamNumber, member):
-        try:
-            msg = self.teams[teamNumber].removeMember(member)
-        except Exception as ex:
-            print(str(ex))
-            msg = '该团队不存在！'
-
-        return msg
-
-
 def judge(message, qid, name, group):
     if message[:2].lower() != 'ns': #如果开头不是ns那么一切免谈，无事发生
         return
@@ -192,11 +53,6 @@ def judge(message, qid, name, group):
         except:
             useBlackList = 0
 
-        #try:
-        #    msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
-        #except:
-        #    msg = '新建团队失败'
-
         leader = sql.hasLeader(qid)
         if leader == -1:
             msg = '权限错误，请先申请成为团长'
@@ -207,7 +63,6 @@ def judge(message, qid, name, group):
             else:
                 msg = '开团成功，{}，团队ID为{}, 集合时间{} {} {}'.format(dungeon, res, date, parseWeekday(date), time)
 
-        #msg = queue.createNewTeam(qid, date, time, dungeon, comment, useBlackList)
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyShowall:
@@ -235,12 +90,6 @@ def judge(message, qid, name, group):
         except:
             teamNumber = None
 
-        #try:
-        #    msg = queue.printQueue(teamNumber)
-        #except:
-        #    isValid = False # 非图片url通道
-        #    msg = '查询错误'
-
         if not res or teamNumber is None:
             msg = '输入的团队ID不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
@@ -251,8 +100,6 @@ def judge(message, qid, name, group):
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
             else:
                 mirai.sendGroupMessage(target=group, content=image, messageType="Image")
-        #msg = queue.printQueue(teamNumber)
-        #mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyEnroll:
         msg = ''
@@ -267,7 +114,7 @@ def judge(message, qid, name, group):
             mental = sql.getMental(vocation)
             assert(mental != -1) # 检查心法是否存在
         except:
-            msg += '缺少角色心法 '
+            msg += '缺少角色心法或心法不存在 '
 
         try:
             memberName = commandPart[3].strip()
@@ -279,12 +126,6 @@ def judge(message, qid, name, group):
             assert(syana==1 or syana==0)
         except:
             syana = 0
-
-        #try:
-        #    member = nsMember(memberName, qid, vocation)
-        #    msg = queue.addMember(teamNumber, member)
-        #except:
-        #    msg += '新建队员错误'
 
         if msg == '':
             res = sql.addMember(teamNumber, qid, memberName, mental, syana)
@@ -312,17 +153,6 @@ def judge(message, qid, name, group):
         except:
             msg += '缺少团队ID'
 
-        #try:
-        #    memberName = commandPart[2].strip()
-        #except:
-        #    msg += '缺少角色名称 '
-
-        #try:
-        #    member = nsMember('', qid, None)
-        #    msg = queue.removeMember(teamNumber, member)
-        #except:
-        #    msg += '新建队员错误'
-
         if msg == '':
             res = sql.delMember(teamNumber, qid)
             if res == 0:
@@ -343,7 +173,6 @@ def judge(message, qid, name, group):
 
         try:
             teamNumber = int(commandPart[1].strip())
-            #msg = queue.removeTeam(qid, teamNumber)
         except:
             msg = '缺少团队ID'
 
@@ -371,7 +200,7 @@ def judge(message, qid, name, group):
             mental = sql.getMental(commandPart[1].strip())
             assert(mental != -1) # 检查心法是否存在
         except:
-            msg += '缺少心法名称'
+            msg += '缺少心法名称或心法不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
             return
 
