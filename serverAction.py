@@ -8,6 +8,10 @@ import sqlConnect as sql
 import MiraiConnnect as mirai
 import generate_image as img
 from utils import parseDate, parseTime, parseWeekday
+try:
+    import init
+except ImportError:
+    print("can not find init file")
 
 keyNewTeam = ['开团', '新建团队', '创建团队']
 keyShowall = ['全团显示', '显示全团', '查看全团', '全团查看', '团队列表']
@@ -373,7 +377,7 @@ def judge(message, qid, name, group):
 
         if msg == '':
             try:
-                with open('./macro/'+str(mental), 'r') as f:
+                with open(init.MACRO_PATH+str(mental), 'r') as f:
                     lines = f.readlines()
                     msg = ''.join(lines)
             except:
