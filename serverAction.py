@@ -91,9 +91,10 @@ def judge(message, qid, name, group):
             teamNumber = int(commandPart[1].strip())
             res = sql.getInfo(teamNumber)
         except:
+            res = []
             teamNumber = None
 
-        if not res or teamNumber is None:
+        if teamNumber is None or not res:
             msg = '输入的团队ID不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
         else:
