@@ -4,6 +4,7 @@ import requests
 import json
 import init
 import time
+import sqlConnect
 from PIL import Image, ImageDraw, ImageFont
 
 url = "https://jx3api.com/api/"
@@ -219,29 +220,27 @@ def getExam(subject: str):
     return name
 
 
-def getEye(mental: str):
-    data = {
-        "name": mental,
-        "token": "153166341"
-    }
+def getEye(mentalID: int):
 
-    r = requests.post(url + 'eye', data)
-    r_data = json.loads(r.text)
-    if r_data['code'] == 0:
-        return ''
+    formation = sqlConnect.getFormation(mentalID)
 
     w, h = 0, 0
     i = 0
 
-    content = r_data['name'] + '\n'
+    content = formation['formationName'] + '\n'
     i += 1
 
-    for level in r_data['data']:
-        content += level['level'] + '：' + level['result'] + '\n'
-        if font.getsize(level['level'] + '：' + level['result'] + '\n')[0] > w:
-            w = font.getsize(level['level'] + '：' + level['result'] + '\n')[0]
+    for key, value in formation.items():
+        if key == "mentalID" or key == "formationName":
+            continue
+        content += value + '\n'
+        if font.getsize(value + '\n')[0] > w:
+            w = font.getsize(value + '\n')[0]
 
         i += 1
+
+    content += "七重归一：无\n"
+    i += 1
 
     h = i * 37
 
