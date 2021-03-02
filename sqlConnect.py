@@ -63,13 +63,14 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
         cursor.close()
         return - 1  #开团失败
 
-#获取心法对应的心法ID
+#利用诨名获取心法相关信息
 #-------输入---------
-#mentalName:输入的心法名称，将尝试在别名和正式命名中双重匹配
+#mentalName:输入的心法诨名，将尝试在别名和正式命名中双重匹配
+#needFullName:返回设定，如果不为0则返回心法的正式名称，默认为0即仅返回心法ID
 #-------输出---------
 #如果不存在此心法则返回-1
-#如果匹配成功，返回此心法的ID
-def getMental(mentalName):
+#如果匹配成功，返回此心法的ID或全名
+def getMental(mentalName,needFullName=0):
     global db
     cursor = db.cursor()
     command = "SELECT * FROM ns_mental WHERE acceptName LIKE '%{}%' OR mentalName='{}'".format(mentalName,mentalName)
@@ -77,7 +78,11 @@ def getMental(mentalName):
     if cursor.rowcount != 0:
         result = cursor.fetchone()
         cursor.close()
-        return result[0]
+        if needFullName == 0:
+            return result[0]
+        else:
+            fullName=result[1]
+            return fullName
     else:
         cursor.close()
         return - 1  #无法获取心法
@@ -186,6 +191,7 @@ def delTeam(teamID, leaderID:int):
     else:
         cursor.close()
         return - 1  #查无此团
+
 #添加一条团长申请
 #-------输入---------
 #QQ:新团长的QQ，从mirai获取
