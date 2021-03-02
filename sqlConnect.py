@@ -333,3 +333,43 @@ def getInfo(teamID):
     else:
         cursor.close()
         return out
+
+#获取指定心法的阵眼
+#-------输入---------
+#mentalID:心法ID，可从getMental获取
+#-------输出---------
+#如果心法不存在，返回空字典
+#如果存在，返回一个字典，格式为：
+#阵眼名称-formationName
+#一重-levelOne
+#二重-levelTwo
+#三重-levelThree
+#四重-levelFour
+#五重-levelFive
+#六重-levelSix
+#不返回七重（七重归一，空）
+def getFormation(mentalID):
+    global db
+    out = {}
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_formation WHERE mentalID={}".format(mentalID)
+    cursor.execute(command)
+    if cursor.rowcount == 1:
+        result = cursor.fetchone()
+        out = {'formationName': result[1], 'levelOne':result[2], 'levelTwo':result[3], 'levelThree':result[4], 'levelFour':result[5], 'levelFive':result[6], 'levelSix':result[7]}
+        cursor.close()
+        return out
+    else:
+        return out
+
+
+def getMember(teamID):
+    global db
+    out={}
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_member WHERE teamID={}".format(teamID)
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+         results = cursor.fetchall()
+    else:
+        return -1
