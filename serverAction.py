@@ -236,14 +236,14 @@ def judge(message, qid, name, group):
             msg = '通用阵眼：田螺(会会+无视防御)\n常用外功阵眼:\n凌雪(攻会) 鲸鱼(破无会) 剑纯(会会无)\n常用内功阵眼:\n莫问(会无) 大师(攻破无) 气纯(会会无) \n花间(回蓝破防) 毒经(破会会)'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
             return
-        fullName = sql.getMental(mentalName=mentalName, needFullName=1)
-        if fullName != -1:
+        mentalID = sql.getMental(mentalName=mentalName)
+        if mentalID != -1:
             try:
-                image = jx3api.getEye(fullName)
+                image = jx3api.getEye(mentalID)
                 mirai.sendGroupMessage(target=group, content=image, messageType="Image")
                 return
             except:
-                msg = 'API 错误，无法获得阵眼数据'
+                msg = '无法获得心法名称，请检查名称'
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
                 
 
