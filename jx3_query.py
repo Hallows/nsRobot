@@ -116,7 +116,7 @@ def getServer(server=init.SERVER):
     return name
 
 
-def getSand(server=init.SERVER):
+def getSandTable(server=init.SERVER):
     data = {"server": server, "token": "153166341"}
     r = requests.post(url + 'sand', data)
     r_data = json.loads(r.text)
@@ -220,7 +220,7 @@ def getExam(subject: str):
     return name
 
 
-def getEye(mentalID: int):
+def getFormation(mentalID: int):
 
     formation = sqlConnect.getFormation(mentalID)
 
