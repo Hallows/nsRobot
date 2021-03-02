@@ -22,6 +22,8 @@ keyDeleteTeam = ['取消开团', '删除团队', '撤销团队', '撤销开团']
 keyMacro = ['宏']
 keyHelp = ['帮助', '指令', '查看指令','指令清单']
 keyAuthor = ['作者', '制作团队', '制作名单']
+keyMedicament = ['小药', '药品', '食物']
+keyFormation = ['阵眼','阵法','阵']
 
 
 def judge(message, qid, name, group):
@@ -224,6 +226,15 @@ def judge(message, qid, name, group):
     elif entrance in keyAuthor:
         msg = '致谢与授权说明： \nhttps://github.com/Hallows/nsRobot/blob/main/README.md'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+    
+    elif entrance in keyFormation:
+        try:
+            mentalName = str(commandPart[1].strip())
+        except:
+            msg = '通用阵眼：田螺(会会+无视防御)\n常用外功阵眼:\n凌雪(攻会) 鲸鱼(破无会) 剑纯(会会无)\n常用内功阵眼:\n莫问(会无) 大师(攻破无) 气纯(会会无) \n花间(回蓝破防) 毒经(破会会)'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            return
+        
 
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
