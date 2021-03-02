@@ -7,6 +7,7 @@
 import sqlConnect as sql
 import MiraiConnnect as mirai
 import generate_image as img
+import jx3_query as jx3api
 from utils import parseDate, parseTime, parseWeekday
 try:
     import init
@@ -234,7 +235,16 @@ def judge(message, qid, name, group):
             msg = '通用阵眼：田螺(会会+无视防御)\n常用外功阵眼:\n凌雪(攻会) 鲸鱼(破无会) 剑纯(会会无)\n常用内功阵眼:\n莫问(会无) 大师(攻破无) 气纯(会会无) \n花间(回蓝破防) 毒经(破会会)'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
             return
-        
+        fullName = sql.getMental(mentalName=mentalName, needFullName=1)
+        if fullName != -1:
+            try:
+                image = jx3api.getEye(fullName)
+                mirai.sendGroupMessage(target=group, content=image, messageType="Image")
+                return
+            except:
+                msg = 'API 错误，无法获得阵眼数据'
+                mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+                
 
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
