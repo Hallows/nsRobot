@@ -424,7 +424,12 @@ def getMember(teamID):
             mentalID=int(row[3])
             if int(row[4]) == 1:
                 primaryMentalInfo = getMentalInfo(mentalID=mentalID)
-                secondaryMentaInfo=getMentalInfo(mentalID=primaryMentalInfo['relation'])
+                if primaryMentalInfo['relation'] != 0:
+                    secondaryMentaInfo = getMentalInfo(mentalID=primaryMentalInfo['relation'])
+                else:
+                    temp = {'QQNumber': row[1], 'nickName': row[2], 'syana': 0, 'mentalColor': primaryMentalInfo['color'], 'mainMentalIcon': primaryMentalInfo['icon'], 'mentalWorks': primaryMentalInfo['works'], 'secMentalIcon': None}
+                    out.append(temp)
+                    continue
                 temp = {'QQNumber': row[1], 'nickName': row[2], 'syana': 1, 'mentalColor': primaryMentalInfo['color'], 'mainMentalIcon': primaryMentalInfo['icon'], 'mentalWorks': primaryMentalInfo['works'], 'secMentalIcon': secondaryMentaInfo['icon']}
                 out.append(temp)
             else:
