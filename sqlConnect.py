@@ -360,16 +360,78 @@ def getFormation(mentalID):
         cursor.close()
         return out
     else:
+        cursor.close()
         return out
 
-
-def getMember(teamID):
+#获取指定心法的信息
+#-------输入---------
+#mentalID:心法ID，可从getMental获取
+#-------输出---------
+#如果心法不存在，返回空字典
+#如果存在，返回一个字典，格式为：
+#心法官方名-name-str
+#心法图标-icon-str
+#心法颜色-color-str
+#心法职能-works-int
+#同门派心法-relation-int
+#示例：
+#{'name': '傲血战意', 'icon': 'axzy.png', 'color': 'ff6f53', 'works': 4, 'relation': 11}
+def getMentalInfo(mentalID):
     global db
     out={}
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_mental WHERE mentalID={}".format(mentalID)
+    cursor.execute(command)
+    if cursor.rowcount != 0:
+        result = cursor.fetchone()
+        cursor.close()
+        out={'name':result[1],'icon':result[2],'color':result[4],'works':result[5],'relation':result[6]}
+        return out
+    else:
+        cursor.close()
+        return out
+
+#获取指定团队的所有报团人员
+#-------输入---------
+#teamID:团队ID
+#-------输出---------
+#如果团队不存在或者没有人报团返回空列表
+#如果团队有人报团，则返回一个“列表-字典”的嵌套结构，其外层为一个列表，其中每个值为一个字典，存储了一个人的报团记录，字典的格式为：
+#报团QQ号-QQNumber
+#报团的角色昵称-nickName
+#是否双修-syana-int-0为不双修，1为双修
+#主心法的颜色-mentaColor
+#主心法的图片-mainMentalIcon
+#主心法的职能-mentalWorks-int
+#双修心法的图标-secMentalIcon-如果是双修，此项为一个str，否则为None
+#一个简略版的返回示例如下所示：
+# [
+#     {'QQNumber': '1263046789', 'nickName': '尹洛洛', 'syana': 0, 'mentalColor': 'ff81b0', 'mainMentalIcon': 'bxj.png', 'mentalWorks': 3, 'secMentalIcon': None},
+#     {'QQNumber': '2906604935', 'nickName': '林籁', 'syana': 1, 'mentalColor': 'f04660', 'mainMentalIcon': 'mzllt.png', 'mentalWorks': 1, 'secMentalIcon': 'fysj.png'},
+#       ...
+#     {'QQNumber': '2946155251', 'nickName': '松下溪', 'syana': 0, 'mentalColor': 'b43c00', 'mainMentalIcon': 'fsj.png', 'mentalWorks': 4, 'secMentalIcon': None}
+# ]
+def getMember(teamID):
+    global db
+    out=[]
     cursor = db.cursor()
     command = "SELECT * FROM ns_member WHERE teamID={}".format(teamID)
     cursor.execute(command)
     if cursor.rowcount != 0:
-         results = cursor.fetchall()
+        results = cursor.fetchall()
+        cursor.close()
+        for row in results:
+            mentalID=int(row[3])
+            if int(row[4]) == 1:
+                primaryMentalInfo = getMentalInfo(mentalID=mentalID)
+                secondaryMentaInfo=getMentalInfo(mentalID=primaryMentalInfo['relation'])
+                temp = {'QQNumber': row[1], 'nickName': row[2], 'syana': 1, 'mentalColor': primaryMentalInfo['color'], 'mainMentalIcon': primaryMentalInfo['icon'], 'mentalWorks': primaryMentalInfo['works'], 'secMentalIcon': secondaryMentaInfo['icon']}
+                out.append(temp)
+            else:
+                primaryMentalInfo = getMentalInfo(mentalID=mentalID)
+                temp = {'QQNumber': row[1], 'nickName': row[2], 'syana': 0, 'mentalColor': primaryMentalInfo['color'], 'mainMentalIcon': primaryMentalInfo['icon'], 'mentalWorks': primaryMentalInfo['works'], 'secMentalIcon': None}
+                out.append(temp)
+        return out
     else:
-        return -1
+        cursor.close()
+        return out
