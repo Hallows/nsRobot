@@ -16,7 +16,8 @@ font = ImageFont.truetype(init.FONT_PATH + 'msyh.ttc', 20, index=1)
 
 
 def GetDate(dateRaw: str):
-    date = time.strptime(dateRaw, "%m-%d %H:%M")
+
+    date = time.strptime(dateRaw, "%Y-%m-%d %H:%M")
     week = {0: "周一", 1: "周二", 2: "周三",
             3: "周四", 4: "周五", 5: "周六", 6: "周日"}
     dateStr = week[date.tm_wday] + ' '
@@ -81,7 +82,7 @@ def GetRGB(id: str) -> tuple:
 def GetImg(id: int):
     # 根据团队id生成图片，返回文件名
 
-    teaminfo = sqlConnect.getInfo(id)
+    teaminfo = sqlConnect.getInfo(id, needYear=1)
 
     if teaminfo == {}:
         return -1
@@ -132,7 +133,8 @@ def GetImg(id: int):
                     fill=0x000000, font=titalFont)
 
     datainfo = "（团队ID:" + \
-        str(teaminfo['teamID']) + "） " + GetDate(teaminfo['startTime'])
+        str(teaminfo['teamID']) + "） " + \
+        GetDate(teaminfo['year']+'-' + teaminfo['startTime'])
 
     time_w, time_h = font.getsize(datainfo)
 
