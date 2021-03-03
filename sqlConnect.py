@@ -295,6 +295,7 @@ def updateDB():
 #获取指定团队的状态
 #-------输入---------
 #teamID:团队ID
+#needYear:可选，是否返回年
 #-------输出---------
 #如果团队不存在，返回空字典
 #如果存在团队，返回一个字典，格式为：
@@ -308,7 +309,8 @@ def updateDB():
 #开团时间-time-格式：11:00
 #例如：
 #{'teamID': 1002, 'leaderName': '渡空离', 'dungeon': '25YX达摩洞', 'startTime': '01-31 20:00', 'comment': '25YX', 'leaderID': 1, 'date': '2021-01-31', 'time': '20:00'}
-def getInfo(teamID):
+#如果指定了needYear，会在上述内容上额外增加一个'year'返回四位年份
+def getInfo(teamID,needYear=0):
     global db
     out={}
     cursor = db.cursor()
@@ -329,6 +331,8 @@ def getInfo(teamID):
         result = cursor.fetchone()
         leaderName = result[2]
         out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment': comment, 'leaderID': leaderID, 'date': date, 'time': time}
+        if needYear != 0:
+            out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment': comment, 'leaderID': leaderID, 'date': date, 'time': time,'year':date[:4]}
         cursor.close()
         return out
     else:
