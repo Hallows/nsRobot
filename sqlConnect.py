@@ -285,8 +285,9 @@ def updateDB():
                 closeTeam = "UPDATE ns_team SET effective=1 WHERE teamID={}".format(teamID)
                 cursor.execute(closeTeam)
                 db.commit()
-                cursor.close()
-                return
+                continue
+        cursor.close()
+        return
     else:
         cursor.close()
         return
