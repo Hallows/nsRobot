@@ -28,7 +28,7 @@ keyFormation = ['阵眼', '阵法', '阵']
 
 
 def judge(message, qid, name, group):
-    if message[:2].lower() != 'ns':  # 如果开头不是ns那么一切免谈，无事发生
+    if message.strip()[:2].lower() != 'ns':  # 如果开头不是ns那么一切免谈，无事发生
         return
 
     ############## Main ###################
