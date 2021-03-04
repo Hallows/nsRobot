@@ -32,7 +32,7 @@ def judge(message, qid, name, group):
         return
 
     ############## Main ###################
-    command = message[2:].strip()  # 把ns去掉后面开始分割这个指令
+    command = message.strip()[2:].strip()  # 把ns去掉后面开始分割这个指令
     commandPart = command.split()  # 按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
     try:
         entrance = commandPart[0].strip()
