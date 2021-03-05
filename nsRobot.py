@@ -5,7 +5,7 @@ import time
 import requests
 import websocket
 import pymysql
-from sqlConnect import SQLConnect 
+import sqlConnect as sql 
 try:
     import thread
 except ImportError:
@@ -19,7 +19,8 @@ except ImportError:
 miraiURL =init.miraiURL
 miraiKey = init.miraiKey
 miraiQQ = init.miraiQQ
-session='newsession'
+session = 'newsession'
+lastSQLReCon = None
 
 def initMirai():
     mirai.setMiraiURL(miraiURL)
@@ -47,6 +48,8 @@ def on_message(ws, message):
             print(temp)
             action.judge(message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
             #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
+        elif lastSQLReCon:
+            sql.SQLReConnect()
     if incomeJson['type'] == 'NewFriendRequestEvent':
         eventID = incomeJson['eventId']
         fromId = incomeJson['fromId']
@@ -71,8 +74,7 @@ def on_open(ws):
 if __name__ == "__main__":
     initMirai()
     wsURL = 'ws://'+init.miraiURL[7:]+'/all?sessionKey=' + mirai.session
-    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-    SQLConnect(db)
+    sql.SQLConnect()
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp(url=wsURL,
                             on_message = on_message,

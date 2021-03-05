@@ -3,13 +3,37 @@ import init
 import time as pytime
 
 db = None
+lastReConTime = None
 
-#传入一个到数据库的连接
-#-------输入---------
-#mydb:有效的数据库连接
-def SQLConnect(mydb):
+#连接到数据库
+def SQLConnect():
     global db
-    db=mydb
+    global lastReConTime
+    try:
+        db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+        lastReConTime = int(pytime.time())
+    except:
+        print('can not open database')
+
+#自动判断重连
+def SQLReConnect(must=0):
+    global db
+    global lastReConTime
+    nowTime = int(pytime.time())
+    if must == 1:
+        db.close()
+        pytime.sleep(2)
+        db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+        lastReConTime = int(pytime.time())
+    else:
+        if nowTime - lastReConTime > 3600:
+            db.close()
+            pytime.sleep(2)
+            db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+            lastReConTime = int(pytime.time())
+            return
+        else:
+            return
 
 #验证是否存在某位团长
 #-------输入---------

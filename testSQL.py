@@ -10,7 +10,7 @@ dbCharset = 'utf8'
 
 temp = pymysql.connect(host=dbHost, port=dbPort, user=dbUser, password=dbPassword, db=dbName, charset=dbCharset)
 
-SQL.SQLConnect(temp)
+SQL.SQLConnect()
 #leaderID = SQL.has_Leader(602857593)
 #print(leaderID)
 #mentalID = SQL.getMental('补天诀')
