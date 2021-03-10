@@ -25,6 +25,7 @@ keyHelp = ['帮助', '指令', '查看指令', '指令清单']
 keyAuthor = ['作者', '制作团队', '制作名单']
 keyMedicament = ['小药', '药品', '食物']
 keyFormation = ['阵眼', '阵法', '阵']
+keyDaily = ['日常', '日常查询']
 
 
 def judge(message, qid, name, group):
@@ -243,6 +244,16 @@ def judge(message, qid, name, group):
                 msg = '无法获得心法名称，请检查名称'
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
+    elif entrance in keyDaily:
+        servername = init.SERVER
+        if len(commandPart) > 1:
+            servername = str(commandPart[1].strip())
+        msg = jx3api.getDaily(servername)
+        if msg == 'error':
+            mirai.sendGroupMessage(target=group, content='日常查询错误！请联系管理员', messageType="TEXT")
+        else:
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
-        mirai.sendGroupMessage(target=group, content=msg,messageType="TEXT", needAT=True, ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
