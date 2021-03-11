@@ -1,6 +1,7 @@
 import pymysql
 import init
 import time as pytime
+from threading import Timer
 
 db = None
 lastReConTime = None
@@ -8,32 +9,44 @@ lastReConTime = None
 #连接到数据库
 def SQLConnect():
     global db
-    global lastReConTime
+    global t
+    # global lastReConTime
     try:
         db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-        lastReConTime = int(pytime.time())
+        # lastReConTime = int(pytime.time())
+        t = Timer(14400, SQLReConnect)
+        t.start()
+
     except:
         print('can not open database')
 
 #自动判断重连
 def SQLReConnect(must=0):
-    global db
-    global lastReConTime
-    nowTime = int(pytime.time())
-    if must == 1:
-        db.close()
-        pytime.sleep(2)
-        db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-        lastReConTime = int(pytime.time())
-    else:
-        if nowTime - lastReConTime > 3600:
-            db.close()
-            pytime.sleep(2)
-            db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-            lastReConTime = int(pytime.time())
-            return
-        else:
-            return
+    # global db
+    # global lastReConTime
+    # nowTime = int(pytime.time())
+    # if must == 1:
+    #     db.close()
+    #     pytime.sleep(2)
+    #     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+    #     lastReConTime = int(pytime.time())
+    # else:
+    #     if nowTime - lastReConTime > 3600:
+    #         db.close()
+    #         pytime.sleep(2)
+    #         db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+    #         lastReConTime = int(pytime.time())
+    #         return
+    #     else:
+    #         return
+    global db, t
+    db.close()
+    pytime.sleep(2)
+    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
+                         password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
+    print("Reconnect Succeed!")
+    t = Timer(7200, SQLReConnect)
+    t.start()
 
 #验证是否存在某位团长
 #-------输入---------

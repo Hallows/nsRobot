@@ -48,8 +48,8 @@ def on_message(ws, message):
             print(temp)
             action.judge(message=incomeMessage, qid=incomeQQ, name=incomeMemberName, group=incomeGroupChatID)
             #mirai.sendGroupMessage(miraiURL,session,target=incomeGroupChatID,content="got your message!",messageType="TEXT",needAT=1,ATQQ=incomeQQ)
-        else:
-            sql.SQLReConnect()
+        # else:
+        #     sql.SQLReConnect()
     if incomeJson['type'] == 'NewFriendRequestEvent':
         eventID = incomeJson['eventId']
         fromId = incomeJson['fromId']

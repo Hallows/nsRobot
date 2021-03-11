@@ -134,9 +134,15 @@ def sendGroupMessage(target, content: str, messageType="TEXT", needAT=False, ATQ
     }
     url=miraiURL+'/sendGroupMessage'
     res = requests.post(url=url, json=requestData)
-    jsonData = res.json()
-    if jsonData['code'] != 0:
-        print("get error {} when send message".format(jsonData['code']))
+
+    try:
+        jsonData = res.json()
+        if jsonData['code'] != 0:
+            print("get error {} when send message".format(jsonData['code']))
+    except:
+        print("Connect error,got{}").format(res.text)
+
+
 
 #对指定群聊中的指定人发送临时消息
 #输入-target：用于发起临时对话的群聊的群号
@@ -161,9 +167,15 @@ def sendTempMessage(target, QQ, content: str, messageType="TEXT"):
     }
     url = miraiURL + '/sendTempMessage'
     res = requests.post(url=url, json=requestData)
-    jsonData = res.json()
-    if jsonData['code'] != 0:
-        print("get error code {} when send Temp message".format(jsonData['code']))
+    
+    try:
+        jsonData = res.json()
+        if jsonData['code'] != 0:
+            print("get error code {} when send Temp message".format(jsonData['code']))
+    except:
+        print("Connect error,got{}").format(res.text)
+
+
 
 
 #------IMPORTANT-------
