@@ -18,6 +18,7 @@ def getDaily(server):
     data = {"server": server}
     r = requests.post(url + 'getDaily', data)
     r_data = json.loads(r.text)
+    print(r_data)
     message = ''
     if r_data['msg'] != 'success':
         message = 'error'
@@ -27,7 +28,7 @@ def getDaily(server):
     message += '秘境大战：' + daily['DayWar'] + '\n'
     message += '今日战场：' + daily['DayBattle'] + '\n'
     message += '驰援任务：' + daily['DayCommon'] + '\n'
-    if daily['DayDraw']:
+    if 'DayDraw' in daily.keys():
         message += '美人画像：' + daily['DayDraw'] + '\n'
     message += '\n【武林通鉴·公共任务】\n'
     message += daily['WeekCommon'] + '\n'
