@@ -7,45 +7,64 @@ import time
 import sqlConnect
 from PIL import Image, ImageDraw, ImageFont
 
-url = "https://jx3api.com/api/"
+url = "https://nico.nicemoe.cn/app/"
 
 font = ImageFont.truetype(init.FONT_PATH + 'msyh.ttc', 30, index=0)
 week = {0: "星期一", 1: "星期二", 2: "星期三",
         3: "星期四", 4: "星期五", 5: "星期六", 6: "星期日"}
 
 
-def getDaily(server=init.SERVER):
-    data = {"server": server, "token": "153166341"}
-    r = requests.post(url + 'daily', data)
+def getDaily(server):
+    data = {"server": server}
+    r = requests.post(url + 'getDaily', data)
     r_data = json.loads(r.text)
-    curtime = time.localtime()
-    content = "今日是公元%d年第%d天，%d月%d日，%s\n" % (
-        curtime.tm_year, curtime.tm_yday, curtime.tm_mon, curtime.tm_mday, week[curtime.tm_wday])
+    message = ''
+    if r_data['msg'] != 'success':
+        message = 'error'
+        return message
+    daily = r_data['data']
+    message += '今天日期：' + daily['Date'] + ' 星期' + daily['Week'] + '\n'
+    message += '秘境大战：' + daily['DayWar'] + '\n'
+    message += '今日战场：' + daily['DayBattle'] + '\n'
+    message += '驰援任务：' + daily['DayCommon'] + '\n'
+    if daily['DayDraw']:
+        message += '美人画像：' + daily['DayDraw'] + '\n'
+    message += '\n【武林通鉴·公共任务】\n'
+    message += daily['WeekCommon'] + '\n'
+    message += '【武林通鉴·秘境任务】\n'
+    message += daily['WeekFive'] + '\n'
+    message += '【武林通鉴·团队秘境】\n'
+    message += daily['WeekTeam']
 
-    w, h = 0, 0
+    return message
+    # curtime = time.localtime()
+    # content = "今日是公元%d年第%d天，%d月%d日，%s\n" % (
+    #     curtime.tm_year, curtime.tm_yday, curtime.tm_mon, curtime.tm_mday, week[curtime.tm_wday])
 
-    for key, value in r_data.items():
-        if key == "时间" or key == "星期":
-            continue
-        else:
-            content += key
-            content += ':'
-            temp = value.replace(';', '、')
-            content += temp
-            content += '\n'
+    # w, h = 0, 0
+    #
+    # for key, value in r_data['data'].items():
+    #     if key == "时间" or key == "星期":
+    #         continue
+    #     else:
+    #         content += key
+    #         content += ':'
+    #         temp = value.replace(';', '、')
+    #         content += temp
+    #         content += '\n'
+    #
+    #         w_temp, h_temp = font.getsize(key + ':' + temp)
+    #         if w_temp > w:
+    #             w = w_temp
+    #         h += int(h_temp * 1.3)
+    #
+    # img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
+    # drawer = ImageDraw.Draw(img)
+    # drawer.text((10, 10), content, 0x000000, font)
+    # name = time.strftime("%y-%m-%d-%H-%M-%S-daily.jpg", time.localtime())
+    # img.save(init.IMAGE_PATH + name)
 
-            w_temp, h_temp = font.getsize(key + ':' + temp)
-            if w_temp > w:
-                w = w_temp
-            h += int(h_temp * 1.3)
-
-    img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
-    drawer = ImageDraw.Draw(img)
-    drawer.text((10, 10), content, 0x000000, font)
-    name = time.strftime("%y-%m-%d-%H-%M-%S-daily.jpg", time.localtime())
-    img.save(init.IMAGE_PATH + name)
-
-    return name
+    # return name
 
 
 def getGold(server=init.SERVER):
