@@ -29,6 +29,7 @@ keyDaily = ['日常', '日常查询']
 keyGold = ['金价']
 keyServer = ['开服']
 keyMethod = ['攻略', '条件']
+keyFlower = ['花价']
 
 
 def judge(message, qid, name, group):
@@ -284,6 +285,16 @@ def judge(message, qid, name, group):
             mirai.sendGroupMessage(target=group, content='参数错误！或者联系管理员', messageType="TEXT")
         else:
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
+    elif entrance in keyFlower:
+        name = ''
+        if len(commandPart) > 1:
+            name = str(commandPart[1].strip())
+        msg = jx3api.getFlower(name)
+        if msg == 'error':
+            mirai.sendGroupMessage(target=group, content='花价查询错误！请联系管理员', messageType="TEXT")
+        else:
+            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
 
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'

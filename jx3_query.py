@@ -195,12 +195,12 @@ def getSandTable(server=init.SERVER):
 
 def getFlower(name: str):
     data = {"server": init.SERVER,
-            "flower": name,
-            "token": "153166341"}
-    r = requests.post(url + 'flower', data)
+            "flower": name}
+    r = requests.post(url + 'getFlower', data)
     r_data = json.loads(r.text)
-    if r_data['code'] != 1:
-        return r_data
+    if r_data['msg'] != 'success':
+        message = 'error'
+        return message
 
     i = 0
     w, h = 500, 1000
