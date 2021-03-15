@@ -68,72 +68,89 @@ def getDaily(server):
     # return name
 
 
-def getGold(server=init.SERVER):
-    data = {"server": server, "token": "153166341"}
-    r = requests.post(url + 'gold', data)
+def getGold(server):
+    data = {"server": server}
+    r = requests.post(url + 'getGold', data)
     r_data = json.loads(r.text)
+    message = ''
+    if r_data['msg'] != 'success':
+        message = 'error'
+        return message
+    gold = r_data['data']
+    message += '金价·'+server+'\n'
+    message += '官方平台：1元 = '+gold['wanbaolou']+'金\n'
+    message += '游募平台：1元 = '+gold['youmu']+'金'
 
-    if r_data['code'] != 1:
-        return ''
+    # if r_data['code'] != 1:
+    #     return ''
+    #
+    # offical = float(r_data['data']['wanbaolou']).__int__()
+    # platform_max = 0
+    # platform_min = 1000
+    #
+    # for key, value in r_data['data'].items():
+    #     if key == 'server' or key == 'wanbaolou':
+    #         continue
+    #     else:
+    #         if float(value).__int__() > platform_max:
+    #             platform_max = float(value).__int__()
+    #         if float(value).__int__() < float(platform_min).__int__():
+    #             platform_min = float(value).__int__()
+    #
+    # content = server + "当前金价为：\n" + "万宝楼：" + (offical - 3).__str__() + '-'+(
+    #     offical + 3).__str__() + '\n' + "平台：" + platform_min.__str__() + '-' + platform_max.__str__() + '\n'
+    #
+    # w, h = 300, 100
+    #
+    # img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
+    # drawer = ImageDraw.Draw(img)
+    # drawer.text((10, 10), content, 0x000000, font)
+    # name = time.strftime("%y-%m-%d-%H-%M-%S-gold.jpg", time.localtime())
+    # img.save(init.IMAGE_PATH + name)
 
-    offical = float(r_data['data']['wanbaolou']).__int__()
-    platform_max = 0
-    platform_min = 1000
+    return message
 
-    for key, value in r_data['data'].items():
-        if key == 'server' or key == 'wanbaolou':
-            continue
-        else:
-            if float(value).__int__() > platform_max:
-                platform_max = float(value).__int__()
-            if float(value).__int__() < float(platform_min).__int__():
-                platform_min = float(value).__int__()
-
-    content = server + "当前金价为：\n" + "万宝楼：" + (offical - 3).__str__() + '-'+(
-        offical + 3).__str__() + '\n' + "平台：" + platform_min.__str__() + '-' + platform_max.__str__() + '\n'
-
-    w, h = 300, 100
-
-    img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
-    drawer = ImageDraw.Draw(img)
-    drawer.text((10, 10), content, 0x000000, font)
-    name = time.strftime("%y-%m-%d-%H-%M-%S-gold.jpg", time.localtime())
-    img.save(init.IMAGE_PATH + name)
-
-    return name
-
-
-def getServer(server=init.SERVER):
-    data = {"server": server, "token": "153166341"}
-    r = requests.post(url + 'server', data)
+def getServer(server):
+    data = {"server": server}
+    r = requests.post(url + 'getServer', data)
     r_data = json.loads(r.text)
-
-    if r_data['code'] != 1:
-        return ''
-
-    content = "服务器：" + server + '\n' + '状    态：\n'
-
-    if r_data['data']['status'] == 1:
-        img = Image.new("RGB", (300, 100), 0xd9ffe2)
+    message = ''
+    if r_data['msg'] != 'success':
+        message = 'error'
+        return message
+    status = r_data['data']
+    if status['status'] == 1:
+        message = server+'状态：【正常】'
     else:
-        img = Image.new("RGB", (300, 100), 0xeaeaea)
-
-    drawer = ImageDraw.Draw(img)
-
-    drawer.text((10, 17), content, 0x000000, font)
-
-    if r_data['data']['status'] == 1:
-        drawer.text((130, 49), "正     常", 0x009342, font)
-    else:
+        message = server+'状态：【维护中】'
         if time.localtime().tm_hour >= 12:
-            drawer.text((130, 49), "已倒闭", 0x0000ff, font)
-        else:
-            drawer.text((130, 49), "维护中", 0x727272, font)
+            message = server+'状态：【已倒闭】'
+    # if r_data['code'] != 1:
+    #     return ''
+    #
+    # content = "服务器：" + server + '\n' + '状    态：\n'
+    #
+    # if r_data['data']['status'] == 1:
+    #     img = Image.new("RGB", (300, 100), 0xd9ffe2)
+    # else:
+    #     img = Image.new("RGB", (300, 100), 0xeaeaea)
+    #
+    # drawer = ImageDraw.Draw(img)
+    #
+    # drawer.text((10, 17), content, 0x000000, font)
+    #
+    # if r_data['data']['status'] == 1:
+    #     drawer.text((130, 49), "正     常", 0x009342, font)
+    # else:
+    #     if time.localtime().tm_hour >= 12:
+    #         drawer.text((130, 49), "已倒闭", 0x0000ff, font)
+    #     else:
+    #         drawer.text((130, 49), "维护中", 0x727272, font)
+    #
+    # name = time.strftime("%y-%m-%d-%H-%M-%S-server.jpg", time.localtime())
+    # img.save(init.IMAGE_PATH + name)
 
-    name = time.strftime("%y-%m-%d-%H-%M-%S-server.jpg", time.localtime())
-    img.save(init.IMAGE_PATH + name)
-
-    return name
+    return message
 
 
 def getSandTable(server=init.SERVER):

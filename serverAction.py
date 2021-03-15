@@ -26,6 +26,8 @@ keyAuthor = ['作者', '制作团队', '制作名单']
 keyMedicament = ['小药', '药品', '食物']
 keyFormation = ['阵眼', '阵法', '阵']
 keyDaily = ['日常', '日常查询']
+keyGold = ['金价']
+keyServer = ['开服']
 
 
 def judge(message, qid, name, group):
@@ -35,6 +37,7 @@ def judge(message, qid, name, group):
     ############## Main ###################
     command = message.strip()[2:].strip()  # 把ns去掉后面开始分割这个指令
     commandPart = command.split()  # 按照空格进行分割，但是后续要看看是不是加入更多的防傻判断
+    servername = init.SERVER
     try:
         entrance = commandPart[0].strip()
     except:
@@ -245,12 +248,29 @@ def judge(message, qid, name, group):
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyDaily:
-        servername = init.SERVER
         if len(commandPart) > 1:
             servername = str(commandPart[1].strip())
         msg = jx3api.getDaily(servername)
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='日常查询错误！请联系管理员', messageType="TEXT")
+        else:
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
+    elif entrance in keyGold:
+        if len(commandPart) > 1:
+            servername = str(commandPart[1].strip())
+        msg = jx3api.getGold(servername)
+        if msg == 'error':
+            mirai.sendGroupMessage(target=group, content='金价查询错误！请联系管理员', messageType="TEXT")
+        else:
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
+    elif entrance in keyServer:
+        if len(commandPart) > 1:
+            servername = str(commandPart[1].strip())
+        msg = jx3api.getServer(servername)
+        if msg == 'error':
+            mirai.sendGroupMessage(target=group, content='服务器状态查询错误！请联系管理员', messageType="TEXT")
         else:
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
