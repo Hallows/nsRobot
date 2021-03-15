@@ -28,6 +28,7 @@ keyFormation = ['阵眼', '阵法', '阵']
 keyDaily = ['日常', '日常查询']
 keyGold = ['金价']
 keyServer = ['开服']
+keyMethod = ['攻略', '条件']
 
 
 def judge(message, qid, name, group):
@@ -271,6 +272,16 @@ def judge(message, qid, name, group):
         msg = jx3api.getServer(servername)
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='服务器状态查询错误！请联系管理员', messageType="TEXT")
+        else:
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
+    elif entrance in keyMethod:
+        name = ''
+        if len(commandPart) > 1:
+            name = str(commandPart[1].strip())
+        msg = jx3api.getMethod(name)
+        if msg == 'error':
+            mirai.sendGroupMessage(target=group, content='参数错误！或者联系管理员', messageType="TEXT")
         else:
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 

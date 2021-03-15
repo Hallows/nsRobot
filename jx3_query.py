@@ -14,6 +14,7 @@ week = {0: "星期一", 1: "星期二", 2: "星期三",
         3: "星期四", 4: "星期五", 5: "星期六", 6: "星期日"}
 
 
+# 日常查询接口
 def getDaily(server):
     data = {"server": server}
     r = requests.post(url + 'getDaily', data)
@@ -68,6 +69,7 @@ def getDaily(server):
     # return name
 
 
+# 金价查询接口
 def getGold(server):
     data = {"server": server}
     r = requests.post(url + 'getGold', data)
@@ -110,6 +112,8 @@ def getGold(server):
 
     return message
 
+
+# 开服查询接口
 def getServer(server):
     data = {"server": server}
     r = requests.post(url + 'getServer', data)
@@ -150,6 +154,25 @@ def getServer(server):
     # name = time.strftime("%y-%m-%d-%H-%M-%S-server.jpg", time.localtime())
     # img.save(init.IMAGE_PATH + name)
 
+    return message
+
+
+# 奇遇前置查询接口
+def getMethod(name):
+    data = {"name": name}
+    r = requests.post(url + 'getMethod', data)
+    r_data = json.loads(r.text)
+    message = ''
+    if r_data['msg'] != 'success':
+        message = 'error'
+        return message
+
+    method = r_data['data']
+    message += name + '·前置条件\n'
+    message += '触发方法：' + method['method'] + '\n'
+    message += '满足条件：' + method['need'] + '\n'
+    message += '其他可能：' + method['other'] + '\n'
+    message += '物品奖励：' + method['reward']
     return message
 
 
