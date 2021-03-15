@@ -16,7 +16,6 @@ def SQLConnect():
         # lastReConTime = int(pytime.time())
         t = Timer(14400, SQLReConnect)
         t.start()
-
     except:
         print('can not open database')
 
@@ -481,4 +480,46 @@ def getMember(teamID):
         return out
     else:
         cursor.close()
+        return out
+#获取小药相关信息
+#-------输入---------
+#level(可选)：1-蓝色小药 2-紫色小药 默认为仅返回紫色小药
+#mentalID(可选):如果有输入，则返回此心法ID对应的推荐四套药，否则返回全部指定level的小药，默认为紫色
+#-------输出---------
+#返回一个“列表-字典”的嵌套结构，其外层为一个列表，其中每个值为一个字典，存储了一种小药，说明如下：
+#药品名称-name
+#小药分类-class
+#增加的属性-gainType
+#增加的值-value
+#蓝色或者紫色？-level，1为蓝色2为紫色
+#对于请求：
+#          SQL.getMedicine(level=1,mentalID=4)
+# 的返回示例如下所示:
+#[
+#    {'name':'奉天·中品益气散', 'class':'增强类药品', 'gainType':'治疗', 'value':'316', 'level':1},
+#    {'name': '奉天·白汁芦筋', 'class': '增强类食品', 'gainType': '治疗', 'value': '245', 'level': 1},
+#    {'name':'奉天·中品静心丸', 'class':'辅助类药品', 'gainType':'根骨', 'value':'146', 'level':1},
+#    {'name': '奉天·老火骨汤', 'class': '辅助类食品', 'gainType': '根骨', 'value': '113', 'level': 1}
+#]
+def getMedicine(level=2,mentalID=0):
+    global db
+    out=[]
+    cursor = db.cursor()
+    if mentalID == 0:
+        command = "SELECT * FROM ns_medicine WHERE level={} ORDER BY itemClassification,gainType".format(level)
+        cursor.execute(command)
+        results = cursor.fetchall()
+        cursor.close()
+        for row in results:
+            temp = {'name': row[0], 'class': row[1], 'gainType': row[2], 'value': row[3], 'level': row[5]}
+            out.append(temp)
+        return out
+    else:
+        command = "SELECT * FROM `ns_medicine` WHERE suggestTo LIKE '% {} %' AND `level`={} ORDER BY itemClassification,gainType".format(mentalID, level)
+        cursor.execute(command)
+        results = cursor.fetchall()
+        cursor.close()
+        for row in results:
+            temp = {'name': row[0], 'class': row[1], 'gainType': row[2], 'value': row[3], 'level': row[5]}
+            out.append(temp)
         return out
