@@ -7,7 +7,7 @@ import time
 import sqlConnect
 from PIL import Image, ImageDraw, ImageFont
 
-url = "https://nico.nicemoe.cn/app/"
+url = "https://jx3api.com/app/"
 
 font = ImageFont.truetype(init.FONT_PATH + 'msyh.ttc', 30, index=0)
 week = {0: "星期一", 1: "星期二", 2: "星期三",
