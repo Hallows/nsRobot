@@ -160,8 +160,8 @@ def getSandTable(server=init.SERVER):
     return name
 
 
-def getFlower(name: str):
-    data = {"server": init.SERVER,
+def getFlower(name: str, server: str):
+    data = {"server": server,
             "flower": name}
     r = requests.post(url + 'getFlower', data)
     r_data = json.loads(r.text)
