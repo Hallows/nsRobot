@@ -28,8 +28,9 @@ keyFormation = ['阵眼', '阵法', '阵']
 keyDaily = ['日常', '日常查询']
 keyGold = ['金价']
 keyServer = ['开服']
-keyMethod = ['攻略', '条件']
+keyMethod = ['攻略', '条件', '前置']
 keyFlower = ['花价']
+keyExam = ['科举']
 
 
 def judge(message, qid, name, group):
@@ -295,6 +296,16 @@ def judge(message, qid, name, group):
         msg = jx3api.getFlower(name, servername)
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='花价查询错误！请联系管理员', messageType="TEXT")
+        else:
+            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
+
+    elif entrance in keyExam:
+        subject = ''
+        if len(commandPart) > 1:
+            subject = str(commandPart[1].strip())
+        msg = jx3api.getExam(subject)
+        if msg == 'error':
+            mirai.sendGroupMessage(target=group, content='科举查询错误！请联系管理员', messageType="TEXT")
         else:
             mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
 

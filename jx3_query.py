@@ -213,14 +213,11 @@ def getFlower(name: str, server: str):
 
 
 def getExam(subject: str):
-    data = {
-        "question":  subject,
-        "token": "153166341"
-    }
-    r = requests.post(url + 'exam', data)
+    data = {"question":  subject}
+    r = requests.post(url + 'getExam', data)
     r_data = json.loads(r.text)
-    if r_data['code'] == 0:
-        return ''
+    if r_data['code'] != 200:
+        return 'error'
 
     w, h = 0, 0
     i = 0
