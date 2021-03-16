@@ -20,53 +20,38 @@ def getDaily(server):
     r = requests.post(url + 'getDaily', data)
     r_data = json.loads(r.text)
     print(r_data)
-    message = ''
     if r_data['msg'] != 'success':
-        message = 'error'
-        return message
-    daily = r_data['data']
-    message += '今天日期：' + daily['Date'] + ' 星期' + daily['Week'] + '\n'
-    message += '秘境大战：' + daily['DayWar'] + '\n'
-    message += '今日战场：' + daily['DayBattle'] + '\n'
-    message += '驰援任务：' + daily['DayCommon'] + '\n'
-    if 'DayDraw' in daily.keys():
-        message += '美人画像：' + daily['DayDraw'] + '\n'
-    message += '\n【武林通鉴·公共任务】\n'
-    message += daily['WeekCommon'] + '\n'
-    message += '【武林通鉴·秘境任务】\n'
-    message += daily['WeekFive'] + '\n'
-    message += '【武林通鉴·团队秘境】\n'
-    message += daily['WeekTeam']
+        return 'error'
 
-    return message
-    # curtime = time.localtime()
-    # content = "今日是公元%d年第%d天，%d月%d日，%s\n" % (
-    #     curtime.tm_year, curtime.tm_yday, curtime.tm_mon, curtime.tm_mday, week[curtime.tm_wday])
+    curtime = time.localtime()
+    content = "今日是公元%d年第%d天，%d月%d日，%s\n" % (
+        curtime.tm_year, curtime.tm_yday, curtime.tm_mon, curtime.tm_mday, week[curtime.tm_wday])
 
-    # w, h = 0, 0
-    #
-    # for key, value in r_data['data'].items():
-    #     if key == "时间" or key == "星期":
-    #         continue
-    #     else:
-    #         content += key
-    #         content += ':'
-    #         temp = value.replace(';', '、')
-    #         content += temp
-    #         content += '\n'
-    #
-    #         w_temp, h_temp = font.getsize(key + ':' + temp)
-    #         if w_temp > w:
-    #             w = w_temp
-    #         h += int(h_temp * 1.3)
-    #
-    # img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
-    # drawer = ImageDraw.Draw(img)
-    # drawer.text((10, 10), content, 0x000000, font)
-    # name = time.strftime("%y-%m-%d-%H-%M-%S-daily.jpg", time.localtime())
-    # img.save(init.IMAGE_PATH + name)
+    w, h = 0, 0
 
-    # return name
+    title = {'DayWar': '秘境大战', 'DayBattle': '今日战场', 'DayCommon': '驰援任务', 'DayDraw': '美人画像', 'WeekCommon': '武林通鉴·公共任务', 'WeekFive': '武林通鉴·秘境任务', 'WeekTeam': '武林通鉴·团队秘境'}
+    for key, value in r_data['data'].items():
+        if key == "Date" or key == "Week":
+            continue
+        else:
+            content += title[key]
+            content += ':'
+            temp = value.replace(';', '、')
+            content += temp
+            content += '\n'
+
+            w_temp, h_temp = font.getsize(title[key] + ':' + temp)
+            if w_temp > w:
+                w = w_temp
+            h += int(h_temp * 1.3)
+
+    img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
+    drawer = ImageDraw.Draw(img)
+    drawer.text((10, 10), content, 0x000000, font)
+    name = time.strftime("%y-%m-%d-%H-%M-%S-daily.jpg", time.localtime())
+    img.save(init.IMAGE_PATH + name)
+
+    return name
 
 
 # 金价查询接口
@@ -74,43 +59,35 @@ def getGold(server):
     data = {"server": server}
     r = requests.post(url + 'getGold', data)
     r_data = json.loads(r.text)
-    message = ''
+
     if r_data['msg'] != 'success':
-        message = 'error'
-        return message
-    gold = r_data['data']
-    message += '金价·'+server+'\n'
-    message += '官方平台：1元 = '+gold['wanbaolou']+'金\n'
-    message += '游募平台：1元 = '+gold['youmu']+'金'
+        return 'error'
 
-    # if r_data['code'] != 1:
-    #     return ''
-    #
-    # offical = float(r_data['data']['wanbaolou']).__int__()
-    # platform_max = 0
-    # platform_min = 1000
-    #
-    # for key, value in r_data['data'].items():
-    #     if key == 'server' or key == 'wanbaolou':
-    #         continue
-    #     else:
-    #         if float(value).__int__() > platform_max:
-    #             platform_max = float(value).__int__()
-    #         if float(value).__int__() < float(platform_min).__int__():
-    #             platform_min = float(value).__int__()
-    #
-    # content = server + "当前金价为：\n" + "万宝楼：" + (offical - 3).__str__() + '-'+(
-    #     offical + 3).__str__() + '\n' + "平台：" + platform_min.__str__() + '-' + platform_max.__str__() + '\n'
-    #
-    # w, h = 300, 100
-    #
-    # img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
-    # drawer = ImageDraw.Draw(img)
-    # drawer.text((10, 10), content, 0x000000, font)
-    # name = time.strftime("%y-%m-%d-%H-%M-%S-gold.jpg", time.localtime())
-    # img.save(init.IMAGE_PATH + name)
+    offical = float(r_data['data']['wanbaolou']).__int__()
+    platform_max = 0
+    platform_min = 1000
 
-    return message
+    for key, value in r_data['data'].items():
+        if key == 'server' or key == 'wanbaolou':
+            continue
+        else:
+            if float(value).__int__() > platform_max:
+                platform_max = float(value).__int__()
+            if float(value).__int__() < float(platform_min).__int__():
+                platform_min = float(value).__int__()
+
+    content = server + "当前金价为：\n" + "万宝楼：" + (offical - 3).__str__() + '-'+(
+        offical + 3).__str__() + '\n' + "平台：" + platform_min.__str__() + '-' + platform_max.__str__() + '\n'
+
+    w, h = 300, 100
+
+    img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
+    drawer = ImageDraw.Draw(img)
+    drawer.text((10, 10), content, 0x000000, font)
+    name = time.strftime("%y-%m-%d-%H-%M-%S-gold.jpg", time.localtime())
+    img.save(init.IMAGE_PATH + name)
+
+    return name
 
 
 # 开服查询接口
@@ -118,43 +95,33 @@ def getServer(server):
     data = {"server": server}
     r = requests.post(url + 'getServer', data)
     r_data = json.loads(r.text)
-    message = ''
-    if r_data['msg'] != 'success':
-        message = 'error'
-        return message
-    status = r_data['data']
-    if status['status'] == 1:
-        message = server+'状态：【正常】'
-    else:
-        message = server+'状态：【维护中】'
-        if time.localtime().tm_hour >= 12:
-            message = server+'状态：【已倒闭】'
-    # if r_data['code'] != 1:
-    #     return ''
-    #
-    # content = "服务器：" + server + '\n' + '状    态：\n'
-    #
-    # if r_data['data']['status'] == 1:
-    #     img = Image.new("RGB", (300, 100), 0xd9ffe2)
-    # else:
-    #     img = Image.new("RGB", (300, 100), 0xeaeaea)
-    #
-    # drawer = ImageDraw.Draw(img)
-    #
-    # drawer.text((10, 17), content, 0x000000, font)
-    #
-    # if r_data['data']['status'] == 1:
-    #     drawer.text((130, 49), "正     常", 0x009342, font)
-    # else:
-    #     if time.localtime().tm_hour >= 12:
-    #         drawer.text((130, 49), "已倒闭", 0x0000ff, font)
-    #     else:
-    #         drawer.text((130, 49), "维护中", 0x727272, font)
-    #
-    # name = time.strftime("%y-%m-%d-%H-%M-%S-server.jpg", time.localtime())
-    # img.save(init.IMAGE_PATH + name)
 
-    return message
+    if r_data['msg'] != 'success':
+        return 'error'
+
+    content = "服务器：" + server + '\n' + '状    态：\n'
+
+    if r_data['data']['status'] == 1:
+        img = Image.new("RGB", (300, 100), 0xd9ffe2)
+    else:
+        img = Image.new("RGB", (300, 100), 0xeaeaea)
+
+    drawer = ImageDraw.Draw(img)
+
+    drawer.text((10, 17), content, 0x000000, font)
+
+    if r_data['data']['status'] == 1:
+        drawer.text((130, 49), "正     常", 0x009342, font)
+    else:
+        if time.localtime().tm_hour >= 12:
+            drawer.text((130, 49), "已倒闭", 0x0000ff, font)
+        else:
+            drawer.text((130, 49), "维护中", 0x727272, font)
+
+    name = time.strftime("%y-%m-%d-%H-%M-%S-server.jpg", time.localtime())
+    img.save(init.IMAGE_PATH + name)
+
+    return name
 
 
 # 奇遇前置查询接口

@@ -256,7 +256,7 @@ def judge(message, qid, name, group):
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='日常查询错误！请联系管理员', messageType="TEXT")
         else:
-            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
 
     elif entrance in keyGold:
         if len(commandPart) > 1:
@@ -265,7 +265,7 @@ def judge(message, qid, name, group):
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='金价查询错误！请联系管理员', messageType="TEXT")
         else:
-            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
 
     elif entrance in keyServer:
         if len(commandPart) > 1:
@@ -274,7 +274,7 @@ def judge(message, qid, name, group):
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='服务器状态查询错误！请联系管理员', messageType="TEXT")
         else:
-            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
 
     elif entrance in keyMethod:
         name = ''
@@ -290,7 +290,7 @@ def judge(message, qid, name, group):
         name = ''
         if len(commandPart) > 1:
             name = str(commandPart[1].strip())
-        msg = jx3api.getFlower(name)
+        msg = jx3api.getFlaaaaaaaaaaaaaaaaaaaaaaaower(name)
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='花价查询错误！请联系管理员', messageType="TEXT")
         else:
