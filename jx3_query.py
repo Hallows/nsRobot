@@ -176,7 +176,10 @@ def getFlower(name: str, server: str):
     i += 2
     for item in r_data['data']['广陵邑']:
         i += 3
-        content += '  ' + item['name'] + '(' + item['color'] + ')：\n    '
+        content += '  ' + item['name']
+        if 'color' in item.keys():
+            content += '(' + item['color'] + ')'
+        content += '：\n    '
         for line in item['line']:
             content += line + ' '
         content += '线\n     '
