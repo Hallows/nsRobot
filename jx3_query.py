@@ -98,7 +98,8 @@ def getServer(server):
 
     if r_data['msg'] != 'success':
         return 'error'
-
+    if isinstance(r_data['data'], list):
+        return 'UncertainServer'
     content = "服务器：" + server + '\n' + '状    态：\n'
 
     if r_data['data']['status'] == 1:

@@ -274,6 +274,8 @@ def judge(message, qid, name, group):
         msg = jx3api.getServer(servername)
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='服务器状态查询错误！请联系管理员', messageType="TEXT")
+        elif msg == 'UncertainServer':
+            mirai.sendGroupMessage(target=group, content='请输入正确的区服名！', messageType="TEXT")
         else:
             mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
 
