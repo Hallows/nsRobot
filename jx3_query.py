@@ -35,7 +35,7 @@ def getDaily(server):
             continue
         else:
             content += title[key]
-            content += ':'
+            content += '：'
             temp = value.replace(';', '、')
             content += temp
             content += '\n'
@@ -59,35 +59,49 @@ def getGold(server):
     data = {"server": server}
     r = requests.post(url + 'getGold', data)
     r_data = json.loads(r.text)
-
+    message = ''
     if r_data['msg'] != 'success':
         return 'error'
-
-    offical = float(r_data['data']['wanbaolou']).__int__()
-    platform_max = 0
-    platform_min = 1000
-
+    gold = r_data['data']
+    message += '金价·'+server+'\n'
+    message += '万  宝 楼：1元 = '+gold['wanbaolou']+'金\n'
+    goldsum = 0
+    n = 0
     for key, value in r_data['data'].items():
         if key == 'server' or key == 'wanbaolou':
             continue
         else:
-            if float(value).__int__() > platform_max:
-                platform_max = float(value).__int__()
-            if float(value).__int__() < float(platform_min).__int__():
-                platform_min = float(value).__int__()
+            goldsum += float(value)
+            n = n + 1
+    message += '平台均价：1元 = ' + str(round(goldsum/n, 2)) + '金'
+    return message
 
-    content = server + "当前金价为：\n" + "万宝楼：" + (offical - 3).__str__() + '-'+(
-        offical + 3).__str__() + '\n' + "平台：" + platform_min.__str__() + '-' + platform_max.__str__() + '\n'
+    # 生成图片方式
+    # offical = float(r_data['data']['wanbaolou']).__int__()
+    # platform_max = 0
+    # platform_min = 1000
+    #
+    # for key, value in r_data['data'].items():
+    #     if key == 'server' or key == 'wanbaolou':
+    #         continue
+    #     else:
+    #         if float(value).__int__() > platform_max:
+    #             platform_max = float(value).__int__()
+    #         if float(value).__int__() < float(platform_min).__int__():
+    #             platform_min = float(value).__int__()
+    #
+    # content = server + "当前金价为：\n" + "万宝楼：" + (offical - 3).__str__() + '-'+(
+    #     offical + 3).__str__() + '\n' + "平台：" + platform_min.__str__() + '-' + platform_max.__str__() + '\n'
+    #
+    # w, h = 300, 100
+    #
+    # img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
+    # drawer = ImageDraw.Draw(img)
+    # drawer.text((10, 10), content, 0x000000, font)
+    # name = time.strftime("%y-%m-%d-%H-%M-%S-gold.jpg", time.localtime())
+    # img.save(init.IMAGE_PATH + name)
 
-    w, h = 300, 100
-
-    img = Image.new("RGB", (w + 20, h + 20), 0xffffff)
-    drawer = ImageDraw.Draw(img)
-    drawer.text((10, 10), content, 0x000000, font)
-    name = time.strftime("%y-%m-%d-%H-%M-%S-gold.jpg", time.localtime())
-    img.save(init.IMAGE_PATH + name)
-
-    return name
+    # return name
 
 
 # 开服查询接口

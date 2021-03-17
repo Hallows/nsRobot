@@ -266,7 +266,7 @@ def judge(message, qid, name, group):
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='金价查询错误！请联系管理员', messageType="TEXT")
         else:
-            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyServer:
         if len(commandPart) > 1:
