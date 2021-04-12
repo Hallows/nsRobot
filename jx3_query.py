@@ -68,7 +68,7 @@ def getGold(server):
     goldsum = 0
     n = 0
     for key, value in r_data['data'].items():
-        if key == 'server' or key == 'wanbaolou':
+        if key == 'server' or key == 'wanbaolou' or value == 'None':
             continue
         else:
             goldsum += float(value)
