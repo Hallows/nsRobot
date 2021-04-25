@@ -187,3 +187,55 @@ def GetImg(id: int):
     img.save(init.IMAGE_PATH + name)
 
     return name
+
+
+def getImgFromText(tital: str = None, content: list = None, font: str = "msyh.ttc", size: int = 20, titalColor: int = 0x000000, contentColor: int = 0x000000, backColor: int = 0xffffff, path: str = ""):
+    width = 0
+    height = 0
+    if tital:
+        titalFont = ImageFont.truetype(init.FONT_PATH + font,int (size * 1.5))
+        contentFont = ImageFont.truetype(init.FONT_PATH + font,size)
+        
+        width = titalFont.getsize(tital)[0]
+
+        for line in content:
+            if contentFont.getsize(line)[0] > width:
+                width = contentFont.getsize(line)[0]
+        height = len(content) * size + 1.5 * size
+
+        titalpos = (10 + (width - titalFont.getsize(tital)[0]) // 2,10)
+
+        img = Image.new("RGB",(int(width) + 20,int(height * 1.2) + 20),backColor)
+        drawer = ImageDraw.Draw(img)
+        drawer.text(titalpos,tital,fill= titalColor,font = titalFont)
+
+        text = ''
+
+        for line in content:
+            text += line + '\n'
+
+        drawer.text((10 , int(10 + size * 1.8)),text,contentColor,contentFont)
+
+    else:
+        contentFont = ImageFont.truetype(init.FONT_PATH + font, size)
+
+        for line in content:
+            if contentFont.getsize(line)[0] > width:
+                width = contentFont.getsize(line)[0]
+        height = len(content) * size
+
+        img = Image.new(
+            "RGB", (int(width) + 20, int(height * 1.2) + 20), backColor)
+        drawer = ImageDraw.Draw(img)
+
+        text = ''
+
+        for line in content:
+            text += line + '\n'
+
+        drawer.text((10, 10),
+                    text, contentColor, contentFont)
+
+    img.save(path)
+
+

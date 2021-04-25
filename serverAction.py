@@ -31,6 +31,7 @@ keyServer = ['开服']
 keyMethod = ['攻略', '条件', '前置']
 keyFlower = ['花价']
 keyExam = ['科举']
+keyMedicine = ['小药']
 
 
 def judge(message, qid, name, group):
@@ -310,6 +311,17 @@ def judge(message, qid, name, group):
             mirai.sendGroupMessage(target=group, content='科举查询错误！请联系管理员', messageType="TEXT")
         else:
             mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
+    
+    elif entrance in keyMedicine:
+        if len(commandPart) == 0:
+            msg = jx3api.GetMedicine()
+        else:
+            msg = jx3api.GetMedicine(commandPart[1].strip())
+        if msg = -1:
+            mirai.sendGroupMessage(target=group,content = "小药查询错误，请检查心法名称",messageType="TEXT")
+        else:
+            mirai.sendGroupMessage(target = group,content = msg,messageType="Image")
+
 
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'

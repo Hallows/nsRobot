@@ -5,6 +5,7 @@ import json
 import init
 import time
 import sqlConnect
+import generate_image as genimg
 from PIL import Image, ImageDraw, ImageFont
 
 url = "https://jx3api.com/app/"
@@ -293,4 +294,30 @@ def getFormation(mentalID: int):
     name = time.strftime("%y-%m-%d-%H-%M-%S-eye.jpg", time.localtime())
     img.save(init.IMAGE_PATH + name)
 
+    return name
+
+
+def GetMedicine(mentalname: str = None):
+    if mentalname:
+        mentalid = sqlConnect.getMental(mentalname)
+        if mentalid == -1:
+            return -1
+        mentalname = sqlConnect.getMental(mentalname,1)
+        medicines = sqlConnect.getMedicine(mentalID =mentalid)
+        tital = "当前版本下" + mentalname + "的可用小药为："
+        content = []
+        for medicine in medicines:
+            content.append(medicine['class'] + ":" + medicine['name'] +  '  ' + medicine["gainType"] + "提高" + medicine['value'] +"点" )
+        content.append("此列表仅为推荐，请根据自身属性选择合适小药")
+        name = time.strftime("%y-%m-%d-%H-%M-%S-medicine.jpg", time.localtime())
+        genimg.getImgFromText(tital = tital,content = content,font = "msyh.ttc",size = 30,titalColor = 0x000000,contentColor = 0x000000,backColor = 0xffffff,path = init.IMAGE_PATH + name)
+    else:
+        medicines = sqlConnect.getMedicine()
+        content = []
+        tital = "小药"
+        for medicine in medicines:
+            content.append(medicine['class'] + ":" + medicine['name'] +
+                           '  ' + medicine["gainType"] + "提高" + medicine['value'] + "点")
+        name = time.strftime("%y-%m-%d-%H-%M-%S-medicine.jpg", time.localtime())
+        genimg.getImgFromText(tital = tital,content = content,font = "msyh.ttc",size = 30,titalColor = 0x000000,contentColor = 0x000000,backColor = 0xffffff,path = init.IMAGE_PATH + name)
     return name
