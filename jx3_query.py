@@ -30,7 +30,7 @@ def getDaily(server):
 
     w, h = 0, 0
 
-    title = {'DayWar': '秘境大战', 'DayBattle': '今日战场', 'DayCommon': '驰援任务', 'DayDraw': '美人画像', 'WeekCommon': '武林通鉴·公共任务', 'WeekFive': '武林通鉴·秘境任务', 'WeekTeam': '武林通鉴·团队秘境'}
+    title = {'DayWar': '秘境大战', 'DayBattle': '今日战场', 'DayCommon': '驰援任务', 'DayDraw': '美人画像', 'WeekCommon': '武林通鉴·公共任务', 'WeekFive': '武林通鉴·秘境任务', 'WeekTeam': '武林通鉴·团队秘境','DayCamp':"阵营日常"}
     for key, value in r_data['data'].items():
         if key == "Date" or key == "Week":
             continue
@@ -304,13 +304,15 @@ def GetMedicine(mentalname: str = None):
             return -1
         mentalname = sqlConnect.getMental(mentalname,1)
         medicines = sqlConnect.getMedicine(mentalID =mentalid)
+        mentalinfo = sqlConnect.getMentalInfo(mentalid)
         tital = "当前版本下" + mentalname + "的可用小药为："
         content = []
         for medicine in medicines:
             content.append(medicine['class'] + ":" + medicine['name'] +  '  ' + medicine["gainType"] + "提高" + medicine['value'] +"点" )
         content.append("此列表仅为推荐，请根据自身属性选择合适小药")
         name = time.strftime("%y-%m-%d-%H-%M-%S-medicine.jpg", time.localtime())
-        genimg.getImgFromText(tital = tital,content = content,font = "msyh.ttc",size = 30,titalColor = 0x000000,contentColor = 0x000000,backColor = 0xffffff,path = init.IMAGE_PATH + name)
+        genimg.getImgFromText(tital=tital, content=content, font="STXINWEI.TTF", size=30,
+                              titalColor='000000', contentColor='13244f', backColor='b2cdf6', path=init.IMAGE_PATH + name,lineEdit=1.05)
     else:
         medicines = sqlConnect.getMedicine()
         content = []
@@ -319,5 +321,6 @@ def GetMedicine(mentalname: str = None):
             content.append(medicine['class'] + ":" + medicine['name'] +
                            '  ' + medicine["gainType"] + "提高" + medicine['value'] + "点")
         name = time.strftime("%y-%m-%d-%H-%M-%S-medicine.jpg", time.localtime())
-        genimg.getImgFromText(tital = tital,content = content,font = "msyh.ttc",size = 30,titalColor = 0x000000,contentColor = 0x000000,backColor = 0xffffff,path = init.IMAGE_PATH + name)
+        genimg.getImgFromText(tital=tital, content=content, font="STXINWEI.TTF", size=30, titalColor='000000',
+                              contentColor='13244f', backColor='b2cdf6', path=init.IMAGE_PATH + name, lineEdit=1.05)
     return name
