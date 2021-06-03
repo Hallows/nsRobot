@@ -28,9 +28,9 @@ def initMirai():
     mirai.getVersion()
     #获取session
     global session
-    session=mirai.getAuth(miraiKey=miraiKey)
+    session=mirai.verify(miraiKey=miraiKey)
     #校验sesson并绑定bot
-    mirai.verify(botNumber=miraiQQ)
+    mirai.bind(botNumber=miraiQQ)
     #开启webSocket
     mirai.startWebSocket()
     #释放sesson

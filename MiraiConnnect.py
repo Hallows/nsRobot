@@ -26,30 +26,30 @@ def getVersion():
 #获取授权码
 #输入-miraiKey: mirai的默认连接key，从配置文件中获取
 #输出-session获取成功返回0
-def getAuth(miraiKey):
+def verify(miraiKey):
     global miraiURL
     global session
-    url=miraiURL+'/auth'
-    requestData = {'authKey': miraiKey}
+    url=miraiURL+'/verify'
+    requestData = {'verifyKey': miraiKey}
     res = requests.post(url=url,json=requestData)
     jsonData = res.json()
     if jsonData['code'] == 0:
-        print('Authorize Success! Got AuthCode {}'.format(jsonData['session']))
+        print('Verify Success! Got session {}'.format(jsonData['session']))
         session = jsonData['session']
         return 0
     else:
-        raise SystemExit('ERROR: Authorize Failed with code {} and the authKey is {}'.format(jsonData['code'], requestData['authKey']))
+        raise SystemExit('ERROR: Verify Failed with code {} and the session is {}'.format(jsonData['code'], requestData['authKey']))
 
 #校验sesson并绑定bot
 #输入-botNumber: 待绑定的机器人的QQ号
-def verify(botNumber):
+def bind(botNumber):
     global miraiURL
     global session
     requestData = {
         'sessionKey': session,
         'qq': botNumber
         }
-    url=miraiURL+'/verify'
+    url=miraiURL+'/bind'
     res = requests.post(url=url, json=requestData)
     jsonData = res.json()
     if jsonData['code'] == 0:
