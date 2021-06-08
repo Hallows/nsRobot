@@ -1,4 +1,4 @@
-import pymysql
+import sqlite3
 import init
 import time as pytime
 from threading import Timer
@@ -8,44 +8,16 @@ lastReConTime = None
 
 #连接到数据库
 def SQLConnect():
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     global t
     # global lastReConTime
     try:
-        db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-        # lastReConTime = int(pytime.time())
-        t = Timer(14400, SQLReConnect)
-        t.start()
+        db = sqlite3.connect('robotData.db')
     except:
         print('can not open database')
-
-#自动判断重连
-def SQLReConnect(must=0):
-    # global db
-    # global lastReConTime
-    # nowTime = int(pytime.time())
-    # if must == 1:
-    #     db.close()
-    #     pytime.sleep(2)
-    #     db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-    #     lastReConTime = int(pytime.time())
-    # else:
-    #     if nowTime - lastReConTime > 3600:
-    #         db.close()
-    #         pytime.sleep(2)
-    #         db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser, password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-    #         lastReConTime = int(pytime.time())
-    #         return
-    #     else:
-    #         return
-    global db, t
-    db.close()
-    pytime.sleep(2)
-    db = pymysql.connect(host=init.dbHost, port=init.dbPort, user=init.dbUser,
-                         password=init.dbPassword, db=init.dbName, charset=init.dbCharset)
-    print("Reconnect Succeed!")
-    t = Timer(7200, SQLReConnect)
-    t.start()
 
 #验证是否存在某位团长
 #-------输入---------
@@ -54,16 +26,19 @@ def SQLReConnect(must=0):
 #如果不存在此团长，或团长的审核状态为未通过，则返回-1
 #如果团长正常存在，返回该团长在数据库内的ID用于后续操作
 def hasLeader(leaderQQ):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     command="SELECT * FROM ns_leader WHERE QQNumber = '{}' AND effective = 0".format(leaderQQ)
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
-        cursor.close()
+        db.close()
         return result[0]
     else:
-        cursor.close()
+        db.close()
         return - 1  #权限错误
 
 #创建一个团队
@@ -78,7 +53,10 @@ def hasLeader(leaderQQ):
 #如果开团成功，返回新开团队的团队ID
 #如果开团失败，返回-1
 def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     try:
         command = "INSERT INTO ns_team(leaderID,dungeon,startDate,startTime,effective,allowBlackList,remark) VALUES({},'{}','{}','{}',0,{},'{}')".format(leaderID, dungeon, date, time, useBlackList, comment)
@@ -89,14 +67,14 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
     except Exception as ex:
         print(str(ex))
         db.rollback()
-        cursor.close()
+        db.close()
         return -1 #开团失败
     if cursor.rowcount != 0:
         result = cursor.fetchone()
-        cursor.close()
+        db.close()
         return result[0]
     else:
-        cursor.close()
+        db.close()
         return - 1  #开团失败
 
 #利用诨名获取心法相关信息
@@ -107,20 +85,23 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
 #如果不存在此心法则返回-1
 #如果匹配成功，返回此心法的ID或全名
 def getMental(mentalName,needFullName=0):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     command = "SELECT * FROM ns_mental WHERE acceptName LIKE '%{}%' OR mentalName='{}'".format(mentalName,mentalName)
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
-        cursor.close()
+        db.close()
         if needFullName == 0:
             return result[0]
         else:
             fullName=result[1]
             return fullName
     else:
-        cursor.close()
+        db.close()
         return - 1  #无法获取心法
 
 #向指定团队添加报名记录
@@ -136,12 +117,15 @@ def getMental(mentalName,needFullName=0):
 #如果传入参数错误返回-2
 #如果团队不存在返回-3（过期的团队视为不存在）
 def addMember(teamID, QQ, nickName, mentalID, syana=0):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
     cursor.execute(command)
     if cursor.rowcount == 0:
-        cursor.close()
+        db.close()
         return -3
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
@@ -152,12 +136,12 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
             db.commit()
         except Exception as ex:
             print(str(ex))
-            cursor.close()
+            db.close()
             return - 2  #写入错误
-        cursor.close()
+        db.close()
         return 0
     else:
-        cursor.close()
+        db.close()
         return - 1  #传入QQ在此团队已经有报名记录
 
 #从指定团队中删除传入QQ的所有报名记录
@@ -170,12 +154,15 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
 #如果传入参数错误返回-2
 #如果团队不存在或者已过期，返回-3
 def delMember(teamID, QQ):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
     cursor.execute(command)
     if cursor.rowcount == 0:
-        cursor.close()
+        db.close()
         return -3 #团队不存在或已过期
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
@@ -186,12 +173,12 @@ def delMember(teamID, QQ):
             db.commit()
         except Exception as ex:
             print(str(ex))
-            cursor.close()
+            db.close()
             return - 2  #数据库写入错误
-        cursor.close()
+        db.close()
         return 0
     else:
-        cursor.close()
+        db.close()
         return - 1  #传入QQ没有在团队有报名记录
 
 #撤销开团
@@ -204,7 +191,10 @@ def delMember(teamID, QQ):
 #如果传入的团长不是传入团队的发起者返回-2
 #数据库写入错误返回-3
 def delTeam(teamID, leaderID:int):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={}".format(teamID)
     cursor.execute(command)
@@ -217,15 +207,15 @@ def delTeam(teamID, leaderID:int):
                 db.commit()
             except Exception as ex:
                 print(str(ex))
-                cursor.close()
+                db.close()
                 return - 3  #数据库写入错误
-            cursor.close()
+            db.close()
             return 0
         else:
-            cursor.close()
+            db.close()
             return - 2  #传入的团长ID不是开团者
     else:
-        cursor.close()
+        db.close()
         return - 1  #查无此团
 
 #添加一条团长申请
@@ -238,24 +228,27 @@ def delTeam(teamID, leaderID:int):
 #如果此QQ已经报名但是没有通过审核，返回-1
 #如果此QQ已经是通过审核的团长，返回-2
 def newLeader(QQ, nickName, activeTime):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     command = "SELECT * FROM ns_leader WHERE QQNumber={} AND effective=1".format(QQ)
     cursor.execute(command)
     if cursor.rowcount != 0:
-        cursor.close()
+        db.close()
         return - 1
     else:
         command = "SELECT * FROM ns_leader WHERE QQNumber={}".format(QQ)
         cursor.execute(command)
         if cursor.rowcount != 0:
-            cursor.close()
+            db.close()
             return - 2
         else:
             command = "INSERT INTO ns_leader(QQNumber,nickName,activeTime,effective) VALUES('{}','{}','{}',1)".format(QQ, nickName, activeTime)
             cursor.execute(command)
             db.commit()
-            cursor.close()
+            db.close()
             return 0
 
 #获取所有在开团队
@@ -275,7 +268,10 @@ def newLeader(QQ, nickName, activeTime):
 #   {'teamID': 1001, 'leaderName': '辰韶', 'dungeon': '达摩洞', 'startTime': '12-31 21:00', 'comment': '25pt达摩洞，来十人熟手'}
 # ]
 def getTeam():
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     updateDB()
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE effective=0"
@@ -298,14 +294,17 @@ def getTeam():
             leaderName=result[2]
             temp = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment':comment}
             out.append(temp)
-    cursor.close()
+    db.close()
     return out
         
 #扫描数据库并更新团队状态，清理所有过期团队
 #无输入
 #无输出
 def updateDB():
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE effective=0"
     cursor.execute(command)
@@ -322,10 +321,10 @@ def updateDB():
                 cursor.execute(closeTeam)
                 db.commit()
                 continue
-        cursor.close()
+        db.close()
         return
     else:
-        cursor.close()
+        db.close()
         return
 
 #获取指定团队的状态
@@ -347,7 +346,10 @@ def updateDB():
 #{'teamID': 1002, 'leaderName': '渡空离', 'dungeon': '25YX达摩洞', 'startTime': '01-31 20:00', 'comment': '25YX', 'leaderID': 1, 'date': '2021-01-31', 'time': '20:00'}
 #如果指定了needYear，会在上述内容上额外增加一个'year'返回四位年份
 def getInfo(teamID,needYear=0):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     out={}
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={}".format(teamID)
@@ -369,10 +371,10 @@ def getInfo(teamID,needYear=0):
         out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment': comment, 'leaderID': leaderID, 'date': date, 'time': time}
         if needYear != 0:
             out = {'teamID': teamID, 'leaderName': leaderName, 'dungeon': dungeon, 'startTime': startTime, 'comment': comment, 'leaderID': leaderID, 'date': date, 'time': time,'year':date[:4]}
-        cursor.close()
+        db.close()
         return out
     else:
-        cursor.close()
+        db.close()
         return out
 
 #获取指定心法的阵眼
@@ -390,7 +392,10 @@ def getInfo(teamID,needYear=0):
 #六重-levelSix
 #不返回七重（七重归一，空）
 def getFormation(mentalID):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     out = {}
     cursor = db.cursor()
     command = "SELECT * FROM ns_formation WHERE mentalID={}".format(mentalID)
@@ -398,10 +403,10 @@ def getFormation(mentalID):
     if cursor.rowcount == 1:
         result = cursor.fetchone()
         out = {'formationName': result[1], 'levelOne':result[2], 'levelTwo':result[3], 'levelThree':result[4], 'levelFour':result[5], 'levelFive':result[6], 'levelSix':result[7]}
-        cursor.close()
+        db.close()
         return out
     else:
-        cursor.close()
+        db.close()
         return out
 
 #获取指定心法的信息
@@ -418,18 +423,21 @@ def getFormation(mentalID):
 #示例：
 #{'name': '傲血战意', 'icon': 'axzy.png', 'color': 'ff6f53', 'works': 4, 'relation': 11}
 def getMentalInfo(mentalID):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     out={}
     cursor = db.cursor()
     command = "SELECT * FROM ns_mental WHERE mentalID={}".format(mentalID)
     cursor.execute(command)
     if cursor.rowcount != 0:
         result = cursor.fetchone()
-        cursor.close()
+        db.close()
         out={'name':result[1],'icon':result[2],'color':result[4],'works':result[5],'relation':result[6]}
         return out
     else:
-        cursor.close()
+        db.close()
         return out
 
 #获取指定团队的所有报团人员
@@ -453,14 +461,17 @@ def getMentalInfo(mentalID):
 #     {'QQNumber': '2946155251', 'nickName': '松下溪', 'syana': 0, 'mentalColor': 'b43c00', 'mainMentalIcon': 'fsj.png', 'mentalWorks': 4, 'secMentalIcon': None}
 # ]
 def getMember(teamID):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     out=[]
     cursor = db.cursor()
     command = "SELECT * FROM ns_member WHERE teamID={}".format(teamID)
     cursor.execute(command)
     if cursor.rowcount != 0:
         results = cursor.fetchall()
-        cursor.close()
+        db.close()
         for row in results:
             mentalID=int(row[3])
             if int(row[4]) == 1:
@@ -479,7 +490,7 @@ def getMember(teamID):
                 out.append(temp)
         return out
     else:
-        cursor.close()
+        db.close()
         return out
 #获取小药相关信息
 #-------输入---------
@@ -502,14 +513,17 @@ def getMember(teamID):
 #    {'name': '奉天·老火骨汤', 'class': '辅助类食品', 'gainType': '根骨', 'value': '113', 'level': 1}
 #]
 def getMedicine(level=2,mentalID=0):
-    global db
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
     out=[]
     cursor = db.cursor()
     if mentalID == 0:
         command = "SELECT * FROM ns_medicine WHERE level={} ORDER BY itemClassification,gainType".format(level)
         cursor.execute(command)
         results = cursor.fetchall()
-        cursor.close()
+        db.close()
         for row in results:
             temp = {'name': row[0], 'class': row[1], 'gainType': row[2], 'value': row[3], 'level': row[5]}
             out.append(temp)
@@ -518,7 +532,7 @@ def getMedicine(level=2,mentalID=0):
         command = "SELECT * FROM `ns_medicine` WHERE suggestTo LIKE '% {} %' AND `level`={} ORDER BY itemClassification,gainType".format(mentalID, level)
         cursor.execute(command)
         results = cursor.fetchall()
-        cursor.close()
+        db.close()
         for row in results:
             temp = {'name': row[0], 'class': row[1], 'gainType': row[2], 'value': row[3], 'level': row[5]}
             out.append(temp)
