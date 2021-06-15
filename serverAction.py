@@ -317,7 +317,7 @@ def judge(message, qid, name, group):
             msg = jx3api.GetMedicine()
         else:
             msg = jx3api.GetMedicine(commandPart[1].strip())
-        if msg = -1:
+        if msg == -1:
             mirai.sendGroupMessage(target=group,content = "小药查询错误，请检查心法名称",messageType="TEXT")
         else:
             mirai.sendGroupMessage(target = group,content = msg,messageType="Image")

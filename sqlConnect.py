@@ -27,13 +27,13 @@ def hasLeader(leaderQQ):
     cursor = db.cursor()
     command="SELECT * FROM ns_leader WHERE QQNumber = '{}' AND effective = 0".format(leaderQQ)
     cursor.execute(command)
-    if cursor.rowcount != 0:
-        result = cursor.fetchone()
+    result = cursor.fetchone()
+    if result != None:
         db.close()
         return result[0]
     else:
         db.close()
-        return - 1  #权限错误
+        return - 1  # 权限错误
 
 #创建一个团队
 #-------输入---------
@@ -63,8 +63,8 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
         db.rollback()
         db.close()
         return -1 #开团失败
-    if cursor.rowcount != 0:
-        result = cursor.fetchone()
+    result = cursor.fetchone()
+    if result != None:
         db.close()
         return result[0]
     else:
@@ -86,8 +86,8 @@ def getMental(mentalName,needFullName=0):
     cursor = db.cursor()
     command = "SELECT * FROM ns_mental WHERE acceptName LIKE '%{}%' OR mentalName='{}'".format(mentalName,mentalName)
     cursor.execute(command)
-    if cursor.rowcount != 0:
-        result = cursor.fetchone()
+    result = cursor.fetchone()
+    if result != None:
         db.close()
         if needFullName == 0:
             return result[0]
@@ -118,12 +118,14 @@ def addMember(teamID, QQ, nickName, mentalID, syana=0):
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
     cursor.execute(command)
-    if cursor.rowcount == 0:
+    result = cursor.fetchone()
+    if result == None:
         db.close()
         return -3
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
-    if cursor.rowcount == 0:
+    result = cursor.fetchone()
+    if result == None:
         try:
             command = "INSERT INTO ns_member(teamID,memberQQ,memberNickname,mentalID,syana) VALUES({},'{}','{}',{},{})".format(teamID,QQ,nickName,mentalID,syana)
             cursor.execute(command)
@@ -155,12 +157,14 @@ def delMember(teamID, QQ):
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(teamID)
     cursor.execute(command)
-    if cursor.rowcount == 0:
+    result=cursor.fetchone()
+    if result == None:
         db.close()
         return -3 #团队不存在或已过期
     command = "SELECT * FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
     cursor.execute(command)
-    if cursor.rowcount != 0:
+    result=cursor.fetchone()
+    if result != None:
         try:
             command = "DELETE FROM ns_member WHERE teamID={} AND memberQQ={}".format(teamID, QQ)
             cursor.execute(command)
@@ -192,8 +196,8 @@ def delTeam(teamID, leaderID:int):
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={}".format(teamID)
     cursor.execute(command)
-    if cursor.rowcount != 0:
-        result = cursor.fetchone()
+    result=cursor.fetchone()
+    if result != None:
         if int(leaderID) == int(result[1]):
             try:
                 command = "UPDATE ns_team SET effective=1 WHERE teamID={}".format(teamID)
@@ -229,13 +233,15 @@ def newLeader(QQ, nickName, activeTime):
     cursor = db.cursor()
     command = "SELECT * FROM ns_leader WHERE QQNumber={} AND effective=1".format(QQ)
     cursor.execute(command)
-    if cursor.rowcount != 0:
+    result=cursor.fetchone()
+    if result != None:
         db.close()
         return - 1
     else:
         command = "SELECT * FROM ns_leader WHERE QQNumber={}".format(QQ)
         cursor.execute(command)
-        if cursor.rowcount != 0:
+        result=cursor.fetchone()
+        if result != None:
             db.close()
             return - 2
         else:
@@ -270,9 +276,9 @@ def getTeam():
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE effective=0"
     cursor.execute(command)
+    results=cursor.fetchall()
     out=[]
-    if cursor.rowcount != 0:
-        results = cursor.fetchall()
+    if results != []:
         for row in results:
             teamID = row[0]
             leaderID = row[1]
@@ -302,8 +308,8 @@ def updateDB():
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE effective=0"
     cursor.execute(command)
-    if cursor.rowcount != 0:
-        results = cursor.fetchall()
+    results = cursor.fetchall()
+    if results != []:
         for row in results:
             teamID=row[0]
             date = row[3]
@@ -348,8 +354,8 @@ def getInfo(teamID,needYear=0):
     cursor = db.cursor()
     command = "SELECT * FROM ns_team WHERE teamID={}".format(teamID)
     cursor.execute(command)
-    if cursor.rowcount != 0:
-        result = cursor.fetchone()
+    result = cursor.fetchone()
+    if result != None:
         teamID = result[0]
         leaderID = result[1]
         dungeon = result[2]
@@ -394,8 +400,8 @@ def getFormation(mentalID):
     cursor = db.cursor()
     command = "SELECT * FROM ns_formation WHERE mentalID={}".format(mentalID)
     cursor.execute(command)
-    if cursor.rowcount == 1:
-        result = cursor.fetchone()
+    result = cursor.fetchone()
+    if result != None:
         out = {'formationName': result[1], 'levelOne':result[2], 'levelTwo':result[3], 'levelThree':result[4], 'levelFour':result[5], 'levelFive':result[6], 'levelSix':result[7]}
         db.close()
         return out
@@ -425,8 +431,8 @@ def getMentalInfo(mentalID):
     cursor = db.cursor()
     command = "SELECT * FROM ns_mental WHERE mentalID={}".format(mentalID)
     cursor.execute(command)
-    if cursor.rowcount != 0:
-        result = cursor.fetchone()
+    result = cursor.fetchone()
+    if result != None:
         db.close()
         out={'name':result[1],'icon':result[2],'color':result[4],'works':result[5],'relation':result[6]}
         return out
@@ -463,8 +469,8 @@ def getMember(teamID):
     cursor = db.cursor()
     command = "SELECT * FROM ns_member WHERE teamID={}".format(teamID)
     cursor.execute(command)
-    if cursor.rowcount != 0:
-        results = cursor.fetchall()
+    results = cursor.fetchall()
+    if results != []:
         db.close()
         for row in results:
             mentalID=int(row[3])
