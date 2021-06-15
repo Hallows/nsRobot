@@ -12,12 +12,6 @@ def SQLConnect():
         db = sqlite3.connect('robotData.db')
     except:
         print('can not open database')
-    global t
-    # global lastReConTime
-    try:
-        db = sqlite3.connect('robotData.db')
-    except:
-        print('can not open database')
 
 #验证是否存在某位团长
 #-------输入---------
