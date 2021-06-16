@@ -1,5 +1,4 @@
 from PIL import Image, ImageDraw, ImageFont
-import pymysql
 from math import ceil
 import time
 from datetime import datetime

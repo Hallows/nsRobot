@@ -1,5 +1,5 @@
+import sqlite3
 import sqlConnect as SQL
-import pymysql
 
 dbHost = '139.198.178.48'
 dbPort = 3306
@@ -8,9 +8,8 @@ dbPassword = 'LOVE@alan1995'
 dbName = 'ns_db'
 dbCharset = 'utf8'
 
-temp = pymysql.connect(host=dbHost, port=dbPort, user=dbUser, password=dbPassword, db=dbName, charset=dbCharset)
+temp = sqlite3.connect("robotData.db")
 
-SQL.SQLConnect()
 #leaderID = SQL.has_Leader(602857593)
 #print(leaderID)
 #mentalID = SQL.getMental('补天诀')

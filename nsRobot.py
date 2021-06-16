@@ -4,7 +4,6 @@ import json
 import time
 import requests
 import websocket
-import pymysql
 import sqlConnect as sql 
 try:
     import thread
@@ -75,7 +74,6 @@ if __name__ == "__main__":
     initMirai()
     wsURL = "ws://{}/all?verifyKey={}&sessionKey={}&qq={}".format(init.miraiURL[7:],miraiKey,mirai.session,miraiQQ)
     print(wsURL)
-    sql.SQLConnect()
     websocket.enableTrace(True)
     ws = websocket.WebSocketApp(url=wsURL,
                             on_message = on_message,
