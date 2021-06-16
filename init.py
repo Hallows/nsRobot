@@ -1,5 +1,7 @@
+import os
 MENTAL_ICON_PATH = "./mental_icon/"
-IMAGE_PATH = "/home/ubuntu/mirai/data/net.mamoe.mirai-api-http/images/"
+ROOT_DIR = os.path.abspath('.')
+IMAGE_PATH = ROOT_DIR+"/temp/img/"
 FONT_PATH = "./font/"
 MACRO_PATH = "./macro/"
 
