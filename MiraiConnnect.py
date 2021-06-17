@@ -87,7 +87,7 @@ def startWebSocket():
     url=miraiURL+'/config'
     requests.post(url=url, json=requestData)
     print('WebSocketStarted!')
-
+ 
 def acceptNewFriend(eventID, fromId, groupId, message,name):
     global miraiURL
     global session
@@ -126,8 +126,8 @@ def sendGroupMessage(target, content: str, messageType="TEXT", needAT=False, ATQ
         temp = {"type": "Plain", "text": content}
         chain.append(temp)
     elif messageType == "Image":
-        imageId=uploadImg(content)
-        temp = {"type": "Image", "imageId": imageId}
+        imagePath=getImgPath(content)
+        temp = {"type": "Image", "path": imagePath}
         chain.append(temp)
     requestData = {
     "sessionKey": session,
@@ -145,23 +145,10 @@ def sendGroupMessage(target, content: str, messageType="TEXT", needAT=False, ATQ
         print("Connect error,got{}").format(res.text)
 
 
-def uploadImg(content:str):
-    global session
+def getImgPath(content:str):
     imagePath=init.IMAGE_PATH+content
     print(imagePath)
-    data={'swssionKey':session,'type':'temp'}
-    files={'img': open(imagePath, 'rb')}
-    url=miraiURL+'/uploadImage'
-    res = requests.post(url=url,data=data,files=files)
-    print(res)
-    try:
-        jsonData = res.json()
-        if jsonData['imageId'] != None:
-            print(jsonData['imageId'])
-            return  jsonData['imageId']
-    except:
-        print("Connect error,got{}").format(res.text)
-        return -1
+    return imagePath
 
 #对指定群聊中的指定人发送临时消息
 #输入-target：用于发起临时对话的群聊的群号
