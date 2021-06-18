@@ -53,7 +53,11 @@ def createNewTeam(date, time, dungeon, comment, leaderID, useBlackList=0):
         print('can not open database')
     cursor = db.cursor()
     try:
-        command = "INSERT INTO ns_team(leaderID,dungeon,startDate,startTime,effective,allowBlackList,remark) VALUES({},'{}','{}','{}',0,{},'{}')".format(leaderID, dungeon, date, time, useBlackList, comment)
+        command = "SELECT * FROM ns_team LIMIT 1 offset (SELECT COUNT(*) - 1 FROM ns_team)"
+        cursor.execute(command)
+        result=cursor.fetchone()
+        teamID=int(result[0])+1
+        command = "INSERT INTO ns_team(teamID,leaderID,dungeon,startDate,startTime,effective,allowBlackList,remark) VALUES({},{},'{}','{}','{}',0,{},'{}')".format(teamID,leaderID, dungeon, date, time, useBlackList, comment)
         cursor.execute(command)
         db.commit()
         command = "SELECT * FROM ns_team WHERE startDate='{}' AND leaderID={} AND startTime='{}'".format(date, leaderID, time)
