@@ -35,6 +35,7 @@ keyFlower = ['花价']
 keyExam = ['科举']
 keyMedicine = ['小药']
 keyBroadcast = ['通知']
+keyApplyLeader=['申请团长']
 
 
 def judge(message, qid, name, group):
@@ -352,6 +353,22 @@ def judge(message, qid, name, group):
             Lib_Time.sleep(5)
         return
 
+    elif entrance in keyApplyLeader:
+        try:
+            nickName=commandPart[1].strip()
+            activeTime=commandPart[2].strip()
+        except:
+            mirai.throwError(target=group, errCode=100)
+            return
+        result=sql.newLeader(QQ=qid,nickName=nickName,activeTime=activeTime)
+        if result == -1:
+            msg='你已经申请过了，请等待审核'
+        if result == -2:
+            msg='你已经是团长了，别闹'
+        if result == 0:
+            msg='申请成功！请联系管理审批！'
+        mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+        
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)

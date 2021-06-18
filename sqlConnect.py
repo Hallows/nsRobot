@@ -249,7 +249,11 @@ def newLeader(QQ, nickName, activeTime):
             db.close()
             return - 2
         else:
-            command = "INSERT INTO ns_leader(QQNumber,nickName,activeTime,effective) VALUES('{}','{}','{}',1)".format(QQ, nickName, activeTime)
+            command = "SELECT * FROM ns_leader LIMIT 1 offset (SELECT COUNT(*) - 1 FROM ns_leader)"
+            cursor.execute(command)
+            result=cursor.fetchone()
+            id=int(result[0])+1
+            command = "INSERT INTO ns_leader(id,QQNumber,nickName,activeTime,effective) VALUES('{}','{}','{}','{}',1)".format(id,QQ, nickName, activeTime)
             cursor.execute(command)
             db.commit()
             db.close()

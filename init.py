@@ -10,3 +10,4 @@ SERVER = "天鹅坪"
 miraiQQ = 2274927840
 miraiKey = 'NSROBOTdevmode'
 miraiURL = 'http://0.0.0.0:8080'
+managerQQ = 602857593
