@@ -4,11 +4,13 @@
 # 输入-name: 发来信息的昵称，用于后续相关确认通知，虽然大概率新版本不需要这样了
 # 输入-group: 接收到信息的群聊ID，用于后续相关确认通知，虽然大概率新版本不需要这样了
 # 输入-db: 数据库链接，在主程序建立到数据库的链接后直接将数据库作为对象传入即可
+from time import strptime
 import sqlConnect as sql
 import MiraiConnnect as mirai
 import generate_image as img
 import jx3_query as jx3api
 from utils import parseDate, parseTime, parseWeekday
+import time as Lib_Time
 try:
     import init
 except ImportError:
@@ -32,6 +34,7 @@ keyMethod = ['攻略', '条件', '前置']
 keyFlower = ['花价']
 keyExam = ['科举']
 keyMedicine = ['小药']
+keyBroadcast = ['通知']
 
 
 def judge(message, qid, name, group):
@@ -321,7 +324,33 @@ def judge(message, qid, name, group):
             mirai.sendGroupMessage(target=group,content = "小药查询错误，请检查心法名称",messageType="TEXT")
         else:
             mirai.sendGroupMessage(target = group,content = msg,messageType="Image")
+    
+    elif entrance in keyBroadcast:
+        try:
+            teamID=commandPart[1].strip()
+            broadMsg=commandPart[2].strip()
+        except:
+            mirai.throwError(target=group, errCode=100)
+            return
+        teamInfo=sql.getInfo(teamID=teamID)
+        if teamInfo==[]:
+            mirai.sendGroupMessage(target=group,content = "输入的团队ID不存在",messageType="TEXT")
+            return
+        leader=sql.hasLeader(qid)
+        if leader==-1:
+            mirai.sendGroupMessage(target=group,content = "你还不是团长，请联系管理员",messageType="TEXT",needAT=True, ATQQ=qid)
 
+        teamInfo=sql.getMember(teamID=teamID)
+        if teamInfo==[]:
+            mirai.sendGroupMessage(target=group,content = "此团队暂时无人报名",messageType="TEXT")
+            return
+        mirai.sendGroupMessage(target=group,content = "信息开始私聊给指定团队，根据人数机器人可能无响应数分钟",messageType="TEXT")
+        for key in teamInfo:
+            QQ=key['QQNumber']
+            print('sending to {}'.format(QQ))
+            mirai.sendTempMessage(target=group,QQ=QQ,content=broadMsg,messageType="TEXT")
+            Lib_Time.sleep(5)
+        return
 
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
