@@ -257,8 +257,31 @@ def newLeader(QQ, nickName, activeTime):
             cursor.execute(command)
             db.commit()
             db.close()
-            return 0
+            return id
 
+#批准一条团长申请
+#-------输入---------
+#LeaderID：团长的ID
+#-------输出---------
+#添加成功返回0
+#如果ID不存在或者已经审核通过，返回-1
+def acceptLeader(leaderID):
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_leader WHERE id={} AND effective=1".format(leaderID)
+    cursor.execute(command)
+    result=cursor.fetchone()
+    if result == None:
+            db.close()
+            return - 1
+    command = "UPDATE ns_leader SET effective=0 WHERE id={}".format(leaderID)
+    cursor.execute(command)
+    db.commit()
+    db.close()
+    return 0
 #获取所有在开团队
 #无输入
 #-------输出---------

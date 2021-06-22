@@ -36,6 +36,7 @@ keyExam = ['科举']
 keyMedicine = ['小药']
 keyBroadcast = ['通知']
 keyApplyLeader=['申请团长']
+keyAcceptLeader=['通过审核']
 
 
 def judge(message, qid, name, group):
@@ -363,10 +364,25 @@ def judge(message, qid, name, group):
         result=sql.newLeader(QQ=qid,nickName=nickName,activeTime=activeTime)
         if result == -1:
             msg='你已经申请过了，请等待审核'
-        if result == -2:
+        elif result == -2:
             msg='你已经是团长了，别闹'
-        if result == 0:
-            msg='申请成功！请联系管理审批！'
+        else:
+            msg='申请成功！你的团长ID是{}请联系管理审批！'.format(result)
+        mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+    
+    elif entrance in keyApplyLeader:
+        try:
+            leaderID=commandPart[1].strip()
+        except:
+            mirai.throwError(target=group, errCode=100)
+            return
+        result=sql.acceptLeader(leaderID=leaderID)
+        if qid!= init.managerQQ:
+            msg='你不是管理员，无权批准，请检查init.py文件中的managerQQ字段确认管理员QQ号'
+        elif result == -1:
+            msg='团长ID不存在或已通过申请'
+        else:
+            msg='批准成功！'
         mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
         
     else:
