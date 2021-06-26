@@ -18,7 +18,7 @@ week = {0: "星期一", 1: "星期二", 2: "星期三",
 # 日常查询接口
 def getDaily(server):
     data = {"server": server}
-    r = requests.post(url + 'getDaily', data)
+    r = requests.post(url + 'daily', data)
     r_data = json.loads(r.text)
     print(r_data)
     if r_data['msg'] != 'success':
@@ -32,11 +32,11 @@ def getDaily(server):
 
     title = {'DayWar': '秘境大战', 'DayBattle': '今日战场', 'DayCommon': '驰援任务', 'DayDraw': '美人画像', 'WeekCommon': '武林通鉴·公共任务', 'WeekFive': '武林通鉴·秘境任务', 'WeekTeam': '武林通鉴·团队秘境','DayCamp':"阵营日常"}
     for key, value in r_data['data'].items():
-        if key == "Date" or key == "Week":
+        if key == "DateTime" or key == "Week":
             continue
         else:
             content += title[key]
-            content += '：'
+            content += ':'
             temp = value.replace(';', '、')
             content += temp
             content += '\n'
@@ -58,7 +58,7 @@ def getDaily(server):
 # 金价查询接口
 def getGold(server):
     data = {"server": server}
-    r = requests.post(url + 'getGold', data)
+    r = requests.post(url + 'gold', data)
     r_data = json.loads(r.text)
     message = ''
     if r_data['msg'] != 'success':
@@ -108,7 +108,7 @@ def getGold(server):
 # 开服查询接口
 def getServer(server):
     data = {"server": server}
-    r = requests.post(url + 'getServer', data)
+    r = requests.post(url + 'check', data)
     r_data = json.loads(r.text)
 
     if r_data['msg'] != 'success':
@@ -143,7 +143,7 @@ def getServer(server):
 # 奇遇前置查询接口
 def getMethod(name):
     data = {"name": name}
-    r = requests.post(url + 'getMethod', data)
+    r = requests.post(url + 'method', data)
     r_data = json.loads(r.text)
     message = ''
     if r_data['msg'] != 'success':
@@ -179,7 +179,7 @@ def getSandTable(server=init.SERVER):
 def getFlower(name: str, server: str):
     data = {"server": server,
             "flower": name}
-    r = requests.post(url + 'getFlower', data)
+    r = requests.post(url + 'flower', data)
     r_data = json.loads(r.text)
     if r_data['msg'] != 'success':
         message = 'error'
@@ -233,7 +233,7 @@ def getFlower(name: str, server: str):
 
 def getExam(subject: str):
     data = {"question":  subject}
-    r = requests.post(url + 'getExam', data)
+    r = requests.post(url + 'exam', data)
     r_data = json.loads(r.text)
     if r_data['code'] != 200:
         return 'error'
@@ -324,3 +324,17 @@ def GetMedicine(mentalname: str = None):
         genimg.getImgFromText(tital=tital, content=content, font="STXINWEI.TTF", size=30, titalColor='000000',
                               contentColor='13244f', backColor='b2cdf6', path=init.IMAGE_PATH + name, lineEdit=1.05)
     return name
+    
+    
+def getRandom():
+    r = requests.post(url + 'random')
+    r_data = json.loads(r.text)
+    message = ''
+    if r_data['msg'] != 'success':
+        message = 'error'
+        return message
+
+    method = r_data['data']
+    message += method['text']
+    
+    return message
