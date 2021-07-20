@@ -232,7 +232,7 @@ def judge(message, qid, name, group):
         mirai.sendTempMessage(target=group, QQ=qid,content=msg, messageType="TEXT")
 
     elif entrance in keyHelp:
-        msg = '在线用户手册： \nhttps://github.com/Hallows/nsRobot/blob/main/doc/userGuide.md'
+        msg = '在线用户手册： \nhttps://www.nsrobot.life/userguide/'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyAuthor:
