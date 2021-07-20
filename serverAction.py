@@ -301,6 +301,9 @@ def judge(message, qid, name, group):
             name = str(commandPart[1].strip())
         if len(commandPart) > 2:
             servername = str(commandPart[2].strip())
+        if name == '':
+            mirai.sendGroupMessage(target=group, content='查询口令请增加具体花类', messageType="TEXT")
+            return
         msg = jx3api.getFlower(name, servername)
         if msg == 'error':
             mirai.sendGroupMessage(target=group, content='花价查询错误！请联系管理员', messageType="TEXT")
