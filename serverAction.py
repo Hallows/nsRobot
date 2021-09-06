@@ -22,6 +22,7 @@ keyQuery = ['查看团队', '查询团队', '查团']
 keyEnroll = ['报名', '报团', '报名团队']
 keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
 keyDeleteTeam = ['取消开团', '删除团队', '撤销团队', '撤销开团']
+keyMyteam=['我报的团','我的报名']
 keyMacro = ['宏']
 keyHelp = ['帮助', '指令', '查看指令', '指令清单']
 keyAuthor = ['作者', '制作团队', '制作名单']
@@ -365,29 +366,53 @@ def judge(message, qid, name, group):
             mirai.throwError(target=group, errCode=100)
             return
         result=sql.newLeader(QQ=qid,nickName=nickName,activeTime=activeTime)
-        if result == -1:
-            msg='你已经申请过了，请等待审核'
-        elif result == -2:
+        if result['result'] ==-1 :
+            msg='你已经申请过了，你的团长ID是{},请等待审核'.format(result['id'])
+        elif result['result'] == -2:
             msg='你已经是团长了，别闹'
         else:
-            msg='申请成功！你的团长ID是{}请联系管理审批！'.format(result)
+            msg='申请成功！你的团长ID是{}请联系管理审批！'.format(result['id'])
         mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
     
-    elif entrance in keyApplyLeader:
+    elif entrance in keyAcceptLeader:
         try:
             leaderID=commandPart[1].strip()
         except:
             mirai.throwError(target=group, errCode=100)
             return
-        result=sql.acceptLeader(leaderID=leaderID)
-        if qid!= init.managerQQ:
+        if qid not in init.managerQQ:
             msg='你不是管理员，无权批准，请检查init.py文件中的managerQQ字段确认管理员QQ号'
-        elif result == -1:
+            mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+            return
+        result=sql.acceptLeader(leaderID=leaderID)
+        if result == -1:
             msg='团长ID不存在或已通过申请'
         else:
             msg='批准成功！'
         mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
-        
+    
+    elif entrance in keyMyteam:
+        try:
+            res=sql.inTeam(qid)
+        except:
+            mirai.throwError(target=group, errCode=500)
+            return
+        if res :
+            msg = ''
+            for i in range(len(res)):
+                g = res[i]
+                msg += '{}. ID：{} 团长:{},{} {} {} {} \n'.format(str(i+1),
+                                                            g['teamID'], g['leaderName'], g['dungeon'],
+                                                            g['startTime'], parseWeekday(g['startTime']), g['comment'])
+            msg += '------------------- \n'
+            print(msg)
+            mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+            return
+        else:
+            msg='目前您未报名任何团队！'
+            mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+            return
+
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
         mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)

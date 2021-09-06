@@ -226,28 +226,33 @@ def delTeam(teamID, leaderID:int):
 #nickName:新团长的昵称
 #activeTime:活跃时间
 #-------输出---------
-#添加成功返回0
-#如果此QQ已经报名但是没有通过审核，返回-1
-#如果此QQ已经是通过审核的团长，返回-2
+#返回一个包含两个元素的字典，其中包括两个字段
+#result：查询结果
+#id：团长ID（如果有）
 def newLeader(QQ, nickName, activeTime):
     try:
         db = sqlite3.connect('robotData.db')
     except:
         print('can not open database')
+    response={'result':0,'id':0}
     cursor = db.cursor()
     command = "SELECT * FROM ns_leader WHERE QQNumber={} AND effective=1".format(QQ)
     cursor.execute(command)
     result=cursor.fetchone()
     if result != None:
         db.close()
-        return - 1
+        response['result'] = -1
+        response['id'] = result[0]
+        return response
     else:
         command = "SELECT * FROM ns_leader WHERE QQNumber={}".format(QQ)
         cursor.execute(command)
         result=cursor.fetchone()
         if result != None:
+            id=result[0]
             db.close()
-            return - 2
+            response['result'] = -2
+            return response
         else:
             command = "SELECT * FROM ns_leader LIMIT 1 offset (SELECT COUNT(*) - 1 FROM ns_leader)"
             cursor.execute(command)
@@ -257,7 +262,9 @@ def newLeader(QQ, nickName, activeTime):
             cursor.execute(command)
             db.commit()
             db.close()
-            return id
+            response['result'] = 0
+            response['id']=id
+            return response
 
 #批准一条团长申请
 #-------输入---------
@@ -271,10 +278,16 @@ def acceptLeader(leaderID):
     except:
         print('can not open database')
     cursor = db.cursor()
-    command = "SELECT * FROM ns_leader WHERE id={} AND effective=1".format(leaderID)
+    command = "SELECT * FROM ns_leader WHERE id={}".format(leaderID)
     cursor.execute(command)
     result=cursor.fetchone()
     if result == None:
+            db.close()
+            return - 1
+    command = "SELECT * FROM ns_leader WHERE id={} AND effective=1".format(leaderID)
+    cursor.execute(command)
+    result=cursor.fetchone()
+    if result != None:
             db.close()
             return - 1
     command = "UPDATE ns_leader SET effective=0 WHERE id={}".format(leaderID)
@@ -563,8 +576,38 @@ def getMedicine(level=2,mentalID=0):
         command = "SELECT * FROM `ns_medicine` WHERE suggestTo LIKE '% {} %' AND `level`={} ORDER BY itemClassification,gainType".format(mentalID, level)
         cursor.execute(command)
         results = cursor.fetchall()
+        cursor.close()
         db.close()
         for row in results:
             temp = {'name': row[0], 'class': row[1], 'gainType': row[2], 'value': row[3], 'level': row[5]}
             out.append(temp)
         return out
+
+#获取指定QQ报名的所有团队
+#-------输入---------
+#QQNumber:QQ号
+#-------输出---------
+#如果没有任何有效的报团记录返回空列表
+#如果有报团，按照getInfo方法的返回格式返回一个列表，内容为每个团的信息字典，详见getInfo方法
+def inTeam(QQNumber):
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
+    out=[]
+    cursor = db.cursor()
+    command = "SELECT * FROM ns_member WHERE memberQQ={}".format(QQNumber)
+    cursor.execute(command)
+    results = cursor.fetchall()
+    cursor.close()
+    cursor = db.cursor()
+    for row in results:
+        if row[0] == None:
+            continue;
+        command = "SELECT * FROM ns_team WHERE teamID={} AND effective=0".format(row[0])
+        cursor.execute(command)
+        result = cursor.fetchone()
+        if result != None:
+            out.append(getInfo(row[0]))
+    cursor.close()
+    return out
