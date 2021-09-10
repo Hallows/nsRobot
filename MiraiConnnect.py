@@ -163,7 +163,8 @@ def sendTempMessage(target, QQ, content: str, messageType="TEXT"):
         temp = {"type": "Plain", "text": content}
         chain.append(temp)
     elif messageType == "Image":
-        temp = {"type": "Image", "path": content}
+        imagePath=getImgPath(content)
+        temp = {"type": "Image", "path": imagePath}
         chain.append(temp)
     requestData = {
     "sessionKey": session,
