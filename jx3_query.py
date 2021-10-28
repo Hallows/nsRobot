@@ -32,7 +32,7 @@ def getDaily(server):
 
     title = {'dayWar': '秘境大战', 'dayBattle': '今日战场', 'dayPublic': '驰援任务', 'dayDraw': '美人画像', 'weekPublic': '武林通鉴·公共任务', 'weekFive': '武林通鉴·秘境任务', 'weekTeam': '武林通鉴·团队秘境','dayCamp':"阵营日常"}
     for key, value in r_data['data'].items():
-        if key == "DateTime" or key == "Week":
+        if key == "date" or key == "week":
             continue
         else:
             content += title[key]
@@ -69,7 +69,7 @@ def getGold(server):
     goldsum = 0
     n = 0
     for key, value in gold.items():
-        if key == 'server' or key == 'wanbaolou' or value == 'None':
+        if key == 'server' or key == 'wanbaolou' or value == 'None' or key == 'time':
             continue
         else:
             goldsum += float(value)
@@ -152,7 +152,7 @@ def getMethod(name):
 
     method = r_data['data']
     message += name + '·前置条件\n'
-    message += '触发方法：' + method['method'] + '\n'
+    message += '触发方法：' + method['means'] + '\n'
     message += '满足条件：' + method['require'] + '\n'
     message += '其他可能：' + method['maybe'] + '\n'
     message += '物品奖励：' + method['reward']
