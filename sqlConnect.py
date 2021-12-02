@@ -1,4 +1,7 @@
+from math import exp
+import re
 import sqlite3
+
 import init
 import time as pytime
 from threading import Timer
@@ -34,6 +37,28 @@ def hasLeader(leaderQQ):
     else:
         db.close()
         return - 1  # 权限错误
+
+
+#获取团长名称
+#-------输入---------
+#leaderid:团长id
+#-------输出---------
+#如果不存在此团长，或团长的审核状态为未通过，则返回-1
+#如果团长正常存在，返回该团长在数据库内的名称用于后续操作
+def getLeader(leaderid):
+    try:
+        db = sqlite3.connect('robotData.db')
+    except:
+        print('can not open database')
+    cursor = db.cursor()
+    cmd = "SELECT * FROM ns_leader WHERE id = '{}' AND effective = 0".format(leaderid)
+    cursor.execute(cmd)
+    result = cursor.fetchone()
+    db.close()
+    if result:
+        return result[2]
+    else:
+        return -1
 
 #创建一个团队
 #-------输入---------

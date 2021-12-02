@@ -4,6 +4,7 @@
 # 输入-name: 发来信息的昵称，用于后续相关确认通知，虽然大概率新版本不需要这样了
 # 输入-group: 接收到信息的群聊ID，用于后续相关确认通知，虽然大概率新版本不需要这样了
 # 输入-db: 数据库链接，在主程序建立到数据库的链接后直接将数据库作为对象传入即可
+import re
 from time import strptime
 import sqlConnect as sql
 import MiraiConnnect as mirai
@@ -23,6 +24,7 @@ keyEnroll = ['报名', '报团', '报名团队']
 keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
 keyDeleteTeam = ['取消开团', '删除团队', '撤销团队', '撤销开团']
 keyMyteam=['我报的团','我的报名']
+keyMyleader = ['我开的团']
 keyMacro = ['宏']
 keyHelp = ['帮助', '指令', '查看指令', '指令清单']
 keyAuthor = ['作者', '制作团队', '制作名单']
@@ -412,6 +414,52 @@ def judge(message, qid, name, group):
             msg='目前您未报名任何团队！'
             mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
             return
+
+            
+    elif entrance in keyMyleader:
+        try:
+            teams = []
+            leaderID = sql.hasLeader(qid)
+            if leaderID != -1:
+                leadername = sql.getLeader(leaderID)
+                teams = sql.getTeam()
+        except:
+            mirai.throwError(target=group, errCode=500)
+            return
+        myteams = []
+        if teams and leaderID != -1:
+            for team in teams:
+                if team['leaderName'] == leadername:
+                    myteams.append(team)
+            if myteams:
+                msg = "团长{}，您当前的在开团队有：\n".format(leadername)
+                for myteam in myteams:
+                    msg += "在{}的{}，id为：{}\n".format(
+                        myteam['startTime'], myteam['dungeon'], myteam['teamID'])
+                print(msg)
+                mirai.sendGroupMessage(
+                    target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+                return
+            else:
+                msg = "团长{},您目前没有在开团队，——干点正事吧！{}!——".format(leadername,leadername)
+                print(msg)
+                mirai.sendGroupMessage(
+                    target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+                return
+        elif leaderID == -1:
+            msg = "别闹，你还不是团长"
+            print(msg)
+            mirai.sendGroupMessage(
+                target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+            return
+        else:
+            msg = "当前没有在开团队"
+            print(msg)
+            mirai.sendGroupMessage(
+                target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+            return
+
+
 
     else:
         msg = '未知指令，请通过 ns帮助 进行查看'
