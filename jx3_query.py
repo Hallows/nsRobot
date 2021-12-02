@@ -30,9 +30,9 @@ def getDaily(server):
 
     w, h = 0, 0
 
-    title = {'DayWar': '秘境大战', 'DayBattle': '今日战场', 'DayCommon': '驰援任务', 'DayDraw': '美人画像', 'WeekCommon': '武林通鉴·公共任务', 'WeekFive': '武林通鉴·秘境任务', 'WeekTeam': '武林通鉴·团队秘境','DayCamp':"阵营日常"}
+    title = {'dayWar': '秘境大战', 'dayBattle': '今日战场', 'dayPublic': '驰援任务', 'dayDraw': '美人画像', 'weekPublic': '武林通鉴·公共任务', 'weekFive': '武林通鉴·秘境任务', 'weekTeam': '武林通鉴·团队秘境','dayCamp':"阵营日常"}
     for key, value in r_data['data'].items():
-        if key == "DateTime" or key == "Week":
+        if key == "date" or key == "week":
             continue
         else:
             content += title[key]
@@ -58,7 +58,7 @@ def getDaily(server):
 # 金价查询接口
 def getGold(server):
     data = {"server": server}
-    r = requests.post(url + 'gold', data)
+    r = requests.post(url + 'demon', data)
     r_data = json.loads(r.text)
     message = ''
     if r_data['msg'] != 'success':
@@ -68,8 +68,8 @@ def getGold(server):
     message += '万  宝 楼：1元 = '+gold['wanbaolou']+'金\n'
     goldsum = 0
     n = 0
-    for key, value in r_data['data'].items():
-        if key == 'server' or key == 'wanbaolou' or value == 'None':
+    for key, value in gold.items():
+        if key == 'server' or key == 'wanbaolou' or value == 'None' or key == 'time':
             continue
         else:
             goldsum += float(value)
@@ -143,7 +143,7 @@ def getServer(server):
 # 奇遇前置查询接口
 def getMethod(name):
     data = {"name": name}
-    r = requests.post(url + 'method', data)
+    r = requests.post(url + 'require', data)
     r_data = json.loads(r.text)
     message = ''
     if r_data['msg'] != 'success':
@@ -152,9 +152,9 @@ def getMethod(name):
 
     method = r_data['data']
     message += name + '·前置条件\n'
-    message += '触发方法：' + method['method'] + '\n'
-    message += '满足条件：' + method['need'] + '\n'
-    message += '其他可能：' + method['other'] + '\n'
+    message += '触发方法：' + method['means'] + '\n'
+    message += '满足条件：' + method['require'] + '\n'
+    message += '其他可能：' + method['maybe'] + '\n'
     message += '物品奖励：' + method['reward']
     return message
 
