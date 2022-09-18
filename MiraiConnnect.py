@@ -190,7 +190,6 @@ def sendTempMessage(target, QQ, content: str, messageType="TEXT"):
 #错误码-含义
 #100-参数错误
 #400-权限错误
-#500-内部错误
 def throwError(target, errCode):
     global miraiURL
     global session
@@ -200,9 +199,6 @@ def throwError(target, errCode):
         chain.append(temp)
     if errCode == 400:
         temp = {"type": "Plain", "text": "权限错误，请联系管理员确认您是否有对应操作的权限"}
-        chain.append(temp)
-    if errCode == 500:
-        temp = {"type": "Plain", "text": "出现了一个内部错误！请联系管理员反馈！"}
         chain.append(temp)
     requestData = {
     "sessionKey": session,

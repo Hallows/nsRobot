@@ -192,9 +192,9 @@ def getImgFromText(tital: str = None, content: list = None, font: str = "msyh.tt
     width = 0
     height = 0
     if tital:
-        titalFont = ImageFont.truetype(init.FONT_PATH + font,int (size * 1.5))
-        contentFont = ImageFont.truetype(init.FONT_PATH + font,size)
-        
+        titalFont = ImageFont.truetype(init.FONT_PATH + font, int(size * 1.5))
+        contentFont = ImageFont.truetype(init.FONT_PATH + font, size)
+
         width = titalFont.getsize(tital)[0]
 
         for line in content:
@@ -202,18 +202,20 @@ def getImgFromText(tital: str = None, content: list = None, font: str = "msyh.tt
                 width = contentFont.getsize(line)[0]
         height = len(content) * size + 1.5 * size
 
-        titalpos = (10 + (width - titalFont.getsize(tital)[0]) // 2,10)
+        titalpos = (10 + (width - titalFont.getsize(tital)[0]) // 2, 10)
 
-        img = Image.new("RGB",(int(width) + 20,int(height * 1.2) + 20),backColor)
+        img = Image.new(
+            "RGB", (int(width) + 20, int(height * 1.2) + 20), backColor)
         drawer = ImageDraw.Draw(img)
-        drawer.text(titalpos,tital,fill= titalColor,font = titalFont)
+        drawer.text(titalpos, tital, fill=titalColor, font=titalFont)
 
         text = ''
 
         for line in content:
             text += line + '\n'
 
-        drawer.text((10 , int(10 + size * 1.8)),text,contentColor,contentFont)
+        drawer.text((10, int(10 + size * 1.8)),
+                    text, contentColor, contentFont)
 
     else:
         contentFont = ImageFont.truetype(init.FONT_PATH + font, size)
@@ -238,3 +240,15 @@ def getImgFromText(tital: str = None, content: list = None, font: str = "msyh.tt
     img.save(path)
 
 
+def get_joined_team(QQNumber):
+    teams = sqlConnect.inTeam(QQNumber)
+    if teams:
+        content = []
+        for team in teams:
+            content.append("{} {}团长在{}的{}\n".format(
+                team['teamID'], team["leaderName"], GetDate(team['year'] + '-' + team['startTime']), team['dungeon']))
+        name = time.strftime("%y-%m-%d-%H-%M-%S-inteam.jpg", time.localtime())
+        getImgFromText("您所报的团有：", content, 'STXINWEI.TTF', path=init.IMAGE_PATH + name)
+        return name
+    else:
+        return None
