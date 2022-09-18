@@ -12,6 +12,8 @@ import generate_image as img
 import jx3_query as jx3api
 from utils import parseDate, parseTime, parseWeekday
 import time as Lib_Time
+import minesweeper as mw
+
 try:
     import init
 except ImportError:
@@ -23,7 +25,7 @@ keyQuery = ['查看团队', '查询团队', '查团']
 keyEnroll = ['报名', '报团', '报名团队']
 keyDisenroll = ['取消报名', '退团', '撤销报团', '取消报团', '撤销报名']
 keyDeleteTeam = ['取消开团', '删除团队', '撤销团队', '撤销开团']
-keyMyteam=['我报的团','我的报名']
+keyMyteam = ['我报的团', '我的报名']
 keyMyleader = ['我开的团']
 keyMacro = ['宏']
 keyHelp = ['帮助', '指令', '查看指令', '指令清单']
@@ -38,11 +40,32 @@ keyFlower = ['花价']
 keyExam = ['科举']
 keyMedicine = ['小药']
 keyBroadcast = ['通知']
-keyApplyLeader=['申请团长']
-keyAcceptLeader=['通过审核']
+keyApplyLeader = ['申请团长']
+keyAcceptLeader = ['通过审核']
+keyMineSweeper = ['扫雷']
+keyMineOpera = ['翻开', '插旗']
+
+MineStatu = 0  # 0:stop,1:start
+mineGame = None
 
 
 def judge(message, qid, name, group):
+    global mineGame
+    global MineStatu
+    if message.strip()[:2] in keyMineOpera and MineStatu == 1:
+        mineGame.execute(message)
+        mineGame.rander()
+        if mineGame.get_state() == mw.GameStatus.over:
+            msg = "boom!"
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            MineStatu = 0
+        elif mineGame.get_state() == mw.GameStatus.win:
+            msg = "清扫完毕"
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            MineStatu = 0
+        msg = 'minesweeper.png'
+        mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
+
     if message.strip()[:2].lower() != 'ns':  # 如果开头不是ns那么一切免谈，无事发生
         return
 
@@ -61,8 +84,8 @@ def judge(message, qid, name, group):
             time = parseTime(commandPart[2].strip())
             dungeon = commandPart[3].strip()
             comment = commandPart[4].strip()
-            assert(date != -1)
-            assert(time != -1)
+            assert (date != -1)
+            assert (time != -1)
         except:
             mirai.throwError(target=group, errCode=100)
             return
@@ -82,7 +105,7 @@ def judge(message, qid, name, group):
             else:
                 msg = '开团成功，{}，团队ID为{}, 集合时间{} {} {}'.format(dungeon, res, date, parseWeekday(date), time)
 
-        mirai.sendGroupMessage(target=group, content=msg,messageType="TEXT", needAT=True, ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyShowall:
         res = sql.getTeam()
@@ -94,13 +117,14 @@ def judge(message, qid, name, group):
             msg = ''
             for i in range(len(res)):
                 g = res[i]
-                msg += '{}. ID：{} {} {} {} {} {} \n'.format(str(i+1),
+                msg += '{}. ID：{} {} {} {} {} {} \n'.format(str(i + 1),
                                                             g['teamID'], g['leaderName'], g['dungeon'],
                                                             g['startTime'], parseWeekday(g['startTime']), g['comment'])
                 msg += '------------------- \n'
 
-        mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~如果没收到请加机器人好友",messageType="TEXT", needAT=True, ATQQ=qid)
-        mirai.sendTempMessage(target=group, QQ=qid,content=msg, messageType="TEXT")
+        # mirai.sendGroupMessage(target=group, content="在开团队已经通过临时会话发给您了~如果没收到请加机器人好友",messageType="TEXT", needAT=True, ATQQ=qid)
+        # mirai.sendTempMessage(target=group, QQ=qid,content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
 
     elif entrance in keyQuery:
         try:
@@ -132,7 +156,7 @@ def judge(message, qid, name, group):
         try:
             vocation = commandPart[2].strip()
             mental = sql.getMental(vocation)
-            assert(mental != -1)  # 检查心法是否存在
+            assert (mental != -1)  # 检查心法是否存在
         except:
             msg += '缺少角色心法或心法不存在 '
 
@@ -143,7 +167,7 @@ def judge(message, qid, name, group):
 
         try:
             syana = int(commandPart[4].strip())
-            assert(syana == 1 or syana == 0)
+            assert (syana == 1 or syana == 0)
         except:
             syana = 0
 
@@ -151,7 +175,8 @@ def judge(message, qid, name, group):
             res = sql.addMember(teamNumber, qid, memberName, mental, syana)
             if res == 0:
                 team = sql.getInfo(teamNumber)
-                msg = '已成功报名 {} {}团长 {} {}-{}'.format(team['startTime'], team['leaderName'],team['dungeon'], vocation, memberName)
+                msg = '已成功报名 {} {}团长 {} {}-{}'.format(team['startTime'], team['leaderName'], team['dungeon'],
+                                                             vocation, memberName)
             elif res == -1:
                 msg = '已经在此团队中'
             elif res == -3:
@@ -161,7 +186,7 @@ def judge(message, qid, name, group):
         else:
             msg += '\n报团格式：ns报团 团队ID 心法 角色名\n双修心法请在报团命令最后额外加空格加1'
 
-        mirai.sendGroupMessage(target=group, content=msg,messageType="TEXT", needAT=True, ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyDisenroll:
         msg = ''
@@ -183,7 +208,7 @@ def judge(message, qid, name, group):
             else:
                 msg = '数据库错误！请联系管理员'
 
-        mirai.sendGroupMessage(target=group, content=msg,messageType="TEXT", needAT=True, ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyDeleteTeam:
         msg = ''
@@ -208,14 +233,14 @@ def judge(message, qid, name, group):
                 else:
                     msg = '数据库错误！请联系管理员'
 
-        mirai.sendGroupMessage(target=group, content=msg,messageType="TEXT", needAT=True, ATQQ=qid)
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
 
     elif entrance in keyMacro:
         msg = ''
 
         try:
             mental = sql.getMental(commandPart[1].strip())
-            assert(mental != -1)  # 检查心法是否存在
+            assert (mental != -1)  # 检查心法是否存在
         except:
             msg += '缺少心法名称或心法不存在'
             mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
@@ -223,7 +248,7 @@ def judge(message, qid, name, group):
 
         if msg == '':
             try:
-                with open(init.MACRO_PATH+str(mental), 'r') as f:
+                with open(init.MACRO_PATH + str(mental), 'r') as f:
                     lines = f.readlines()
                     msg = ''.join(lines)
             except:
@@ -231,8 +256,9 @@ def judge(message, qid, name, group):
                 mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
                 return
 
-        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了，如果没收到请加机器人好友',messageType="TEXT", needAT=True, ATQQ=qid)
-        mirai.sendTempMessage(target=group, QQ=qid,content=msg, messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content='宏命令已经通过临时会话私发给您了，如果没收到请加机器人好友',
+                               messageType="TEXT", needAT=True, ATQQ=qid)
+        mirai.sendTempMessage(target=group, QQ=qid, content=msg, messageType="TEXT")
 
     elif entrance in keyHelp:
         msg = '在线用户手册： \nhttps://www.nsrobot.life/userguide/'
@@ -322,100 +348,103 @@ def judge(message, qid, name, group):
             mirai.sendGroupMessage(target=group, content='科举查询错误！请联系管理员', messageType="TEXT")
         else:
             mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
-    
+
     elif entrance in keyMedicine:
         if len(commandPart) == 0:
             msg = jx3api.GetMedicine()
         else:
             msg = jx3api.GetMedicine(commandPart[1].strip())
         if msg == -1:
-            mirai.sendGroupMessage(target=group,content = "小药查询错误，请检查心法名称",messageType="TEXT")
+            mirai.sendGroupMessage(target=group, content="小药查询错误，请检查心法名称", messageType="TEXT")
         else:
-            mirai.sendGroupMessage(target = group,content = msg,messageType="Image")
-    
+            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
+
     elif entrance in keyBroadcast:
         try:
-            teamID=commandPart[1].strip()
-            broadMsg=commandPart[2].strip()
+            teamID = commandPart[1].strip()
+            broadMsg = commandPart[2].strip()
         except:
             mirai.throwError(target=group, errCode=100)
             return
-        teamInfo=sql.getInfo(teamID=teamID)
-        if teamInfo==[]:
-            mirai.sendGroupMessage(target=group,content = "输入的团队ID不存在",messageType="TEXT")
+        teamInfo = sql.getInfo(teamID=teamID)
+        if teamInfo == []:
+            mirai.sendGroupMessage(target=group, content="输入的团队ID不存在", messageType="TEXT")
             return
-        leader=sql.hasLeader(qid)
-        if leader==-1:
-            mirai.sendGroupMessage(target=group,content = "你还不是团长，请联系管理员",messageType="TEXT",needAT=True, ATQQ=qid)
+        leader = sql.hasLeader(qid)
+        if leader == -1:
+            mirai.sendGroupMessage(target=group, content="你还不是团长，请联系管理员", messageType="TEXT", needAT=True,
+                                   ATQQ=qid)
 
-        teamInfo=sql.getMember(teamID=teamID)
-        if teamInfo==[]:
-            mirai.sendGroupMessage(target=group,content = "此团队暂时无人报名",messageType="TEXT")
+        teamInfo = sql.getMember(teamID=teamID)
+        if teamInfo == []:
+            mirai.sendGroupMessage(target=group, content="此团队暂时无人报名", messageType="TEXT")
             return
-        mirai.sendGroupMessage(target=group,content = "信息开始私聊给指定团队，根据人数机器人可能无响应数分钟",messageType="TEXT")
+        mirai.sendGroupMessage(target=group, content="信息开始私聊给指定团队，根据人数机器人可能无响应数分钟",
+                               messageType="TEXT")
         for key in teamInfo:
-            QQ=key['QQNumber']
+            QQ = key['QQNumber']
             print('sending to {}'.format(QQ))
-            mirai.sendTempMessage(target=group,QQ=QQ,content=broadMsg,messageType="TEXT")
+            mirai.sendTempMessage(target=group, QQ=QQ, content=broadMsg, messageType="TEXT")
             Lib_Time.sleep(5)
         return
 
     elif entrance in keyApplyLeader:
         try:
-            nickName=commandPart[1].strip()
-            activeTime=commandPart[2].strip()
+            nickName = commandPart[1].strip()
+            activeTime = commandPart[2].strip()
         except:
             mirai.throwError(target=group, errCode=100)
             return
-        result=sql.newLeader(QQ=qid,nickName=nickName,activeTime=activeTime)
-        if result['result'] ==-1 :
-            msg='你已经申请过了，你的团长ID是{},请等待审核'.format(result['id'])
+        result = sql.newLeader(QQ=qid, nickName=nickName, activeTime=activeTime)
+        if result['result'] == -1:
+            msg = '你已经申请过了，你的团长ID是{},请等待审核'.format(result['id'])
         elif result['result'] == -2:
-            msg='你已经是团长了，别闹'
+            msg = '你已经是团长了，别闹'
         else:
-            msg='申请成功！你的团长ID是{}请联系管理审批！'.format(result['id'])
-        mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
-    
+            msg = '申请成功！你的团长ID是{}请联系管理审批！'.format(result['id'])
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+
     elif entrance in keyAcceptLeader:
         try:
-            leaderID=commandPart[1].strip()
+            leaderID = commandPart[1].strip()
         except:
             mirai.throwError(target=group, errCode=100)
             return
         if qid not in init.managerQQ:
-            msg='你不是管理员，无权批准，请检查init.py文件中的managerQQ字段确认管理员QQ号'
-            mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+            msg = '你不是管理员，无权批准，请检查init.py文件中的managerQQ字段确认管理员QQ号'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
             return
-        result=sql.acceptLeader(leaderID=leaderID)
+        result = sql.acceptLeader(leaderID=leaderID)
         if result == -1:
-            msg='团长ID不存在或已通过申请'
+            msg = '团长ID不存在或已通过申请'
         else:
-            msg='批准成功！'
-        mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
-    
+            msg = '批准成功！'
+        mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
+
     elif entrance in keyMyteam:
         try:
-            res=sql.inTeam(qid)
+            res = sql.inTeam(qid)
         except:
             mirai.throwError(target=group, errCode=500)
             return
-        if res :
+        if res:
             msg = ''
             for i in range(len(res)):
                 g = res[i]
-                msg += '{}. ID：{} 团长:{},{} {} {} {} \n'.format(str(i+1),
-                                                            g['teamID'], g['leaderName'], g['dungeon'],
-                                                            g['startTime'], parseWeekday(g['startTime']), g['comment'])
+                msg += '{}. ID：{} 团长:{},{} {} {} {} \n'.format(str(i + 1),
+                                                                 g['teamID'], g['leaderName'], g['dungeon'],
+                                                                 g['startTime'], parseWeekday(g['startTime']),
+                                                                 g['comment'])
             msg += '------------------- \n'
             print(msg)
-            mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
             return
         else:
-            msg='目前您未报名任何团队！'
-            mirai.sendGroupMessage(target=group,content = msg,messageType="TEXT",needAT=True, ATQQ=qid)
+            msg = '目前您未报名任何团队！'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
             return
 
-            
+
     elif entrance in keyMyleader:
         try:
             teams = []
@@ -441,7 +470,7 @@ def judge(message, qid, name, group):
                     target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
                 return
             else:
-                msg = "团长{},您目前没有在开团队，——干点正事吧！{}!——".format(leadername,leadername)
+                msg = "团长{},您目前没有在开团队，——干点正事吧！{}!——".format(leadername, leadername)
                 print(msg)
                 mirai.sendGroupMessage(
                     target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
@@ -458,6 +487,21 @@ def judge(message, qid, name, group):
             mirai.sendGroupMessage(
                 target=group, content=msg, messageType="TEXT", needAT=True, ATQQ=qid)
             return
+    elif entrance in keyMineSweeper:
+        # global MineStatu
+        # global mineGame
+        if MineStatu == 0:
+            MineStatu = 1
+            msg = '扫雷开始，请使用诸如 翻开 a5 或者 插旗 a5 这样的指令进行游玩，请注意一次只能进行一种操作'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+            mineGame = mw.Game(16, 16, 40)
+            mineGame.rander()
+            msg = 'minesweeper.png'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="Image")
+        else:
+            msg = '已经开始一局游戏了！'
+            mirai.sendGroupMessage(target=group, content=msg, messageType="TEXT")
+
 
 
 
