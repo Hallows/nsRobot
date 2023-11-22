@@ -78,15 +78,12 @@ def GetRGB(id: str) -> tuple:
     return (r, g, b)
 
 
-def GetImg(id: int):
+async def GetImg(id: int, group_id):
     # 根据团队id生成图片，返回文件名
-
-    teaminfo = sqlConnect.getInfo(id, needYear=1)
-
+    teaminfo = await sqlConnect.conf.getInfo(id, group_id, needYear=1)
     if teaminfo == {}:
         return -1
-
-    memberlist = sqlConnect.getMember(id)
+    memberlist = await sqlConnect.conf.getMember(id)
 
     canvasLength = 1200
     canvasHeight = 480
@@ -97,17 +94,23 @@ def GetImg(id: int):
     tank = []
 
     for member in memberlist:
-
         if member['mentalWorks'] == 1:
-            tank.append(member)
+            if len(healer)+len(tank)>=5:
+                internal.append(member)
+            else:
+                tank.append(member)
         elif member['mentalWorks'] == 2:
-            healer.append(member)
+            if len(healer)+len(tank) >= 5:
+                external.append(member)
+            else:
+                healer.append(member)
         elif member['mentalWorks'] == 3:
             internal.append(member)
         elif member['mentalWorks'] == 4:
             external.append(member)
         else:
             return -2
+
 
     if len(internal) > 10 or len(external) > 10 or len(tank) + len(healer) > 5:
         num = max(ceil(len(internal) / 2),
@@ -128,12 +131,12 @@ def GetImg(id: int):
     if w > canvasLength:
         drawer.text((0, 10), tital, fill=0x000000, font=titalFont)
     else:
-        drawer.text(((canvasLength - w)//2, 10), tital,
+        drawer.text(((canvasLength - w) // 2, 10), tital,
                     fill=0x000000, font=titalFont)
 
     datainfo = "（团队ID:" + \
-        str(teaminfo['teamID']) + "） " + \
-        GetDate(teaminfo['year']+'-' + teaminfo['startTime'])
+               str(teaminfo['teamID']) + "） " + \
+               GetDate(teaminfo['year'] + '-' + teaminfo['startTime'])
 
     time_w, time_h = font.getsize(datainfo)
 
@@ -154,39 +157,38 @@ def GetImg(id: int):
         drawer.rectangle(
             ((startX + (boxLength * i),
               startY,
-              startX + boxLength*(i + 1),
+              startX + boxLength * (i + 1),
               startY + boxHeight / 2)),
             fill=(255, 255, 255),
             outline=(0, 0, 0),
             width=1)
         drawer.text((startX + (boxLength * (i + 0.5)),
-                     startY), int(i+1).__str__(), fill=(0, 0, 0), font=font)
+                     startY), int(i + 1).__str__(), fill=(0, 0, 0), font=font)
 
     for i in range(len(external)):
         if i % 2 == 0:
-            DrawRectangal(img, 0, i//2, external[i])
+            DrawRectangal(img, 0, i // 2, external[i])
         elif i % 2 == 1:
-            DrawRectangal(img, 1, i//2, external[i])
+            DrawRectangal(img, 1, i // 2, external[i])
 
     for i in range(len(internal)):
         if i % 2 == 0:
-            DrawRectangal(img, 2, i//2, internal[i])
+            DrawRectangal(img, 2, i // 2, internal[i])
         elif i % 2 == 1:
-            DrawRectangal(img, 3, i//2, internal[i])
+            DrawRectangal(img, 3, i // 2, internal[i])
 
     for i in range(len(tank)):
         DrawRectangal(img, 4, i, tank[i])
 
     temp = len(tank)
     for i in range(len(healer)):
-        DrawRectangal(img, 4, i+temp, healer[i])
+        DrawRectangal(img, 4, i + temp, healer[i])
 
     Time = time.strftime("%y-%m-%d-%H-%M-%S", time.localtime(time.time()))
     name = Time + '-' + id.__str__() + '.jpg'
     img.save(init.IMAGE_PATH + name)
 
     return name
-
 
 def getImgFromText(tital: str = None, content: list = None, font: str = "msyh.ttc", size: int = 20, titalColor: int = 0x000000, contentColor: int = 0x000000, backColor: int = 0xffffff, path: str = ""):
     width = 0
